@@ -178,6 +178,38 @@
                 </div>
             </div>
         </div>
+        <div class="row">
+            
+            <div class="col-lg-6 grid-margin stretch-card">
+                <div class="card" style="height: 500px !important;overflow:scroll">
+                    <div class="card-body">
+                        <div class="item" style="position: sticky; top:10px;background-color:white">
+                            <h4 class="card-title text-danger">Device Configuration</h4>
+                            <p class="card-description">
+                            </p>
+                        </div>
+                        <div class="table-responsive">
+                            <form action="{%url 'DeviceConfig' config.id %}" method="post">
+                                {% csrf_token %}
+                                <label for="">JWT IP</label>
+                                <input type="text" name="jwtip" value="{{config.JWT_IP}}" class="form-control"><br><br>
+                                <label for="">JWT PORT</label>
+                                <input type="text" name="jwtport" value="{{config.JWT_PORT}}" class="form-control"><br><br>
+                                <label for="">Callback IP</label>
+                                <input type="text" name="callip" value="{{config.Call_Back_IP}}" class="form-control"><br><br>
+                                <label for="">Callback Port</label>
+                                <input type="text" name="callport" value="{{config.Call_Back_Port}}" class="form-control"><br><br>
+                                <label for="">Admin Username</label>
+                                <input type="text" name="adminusr" value="{{config.Admin_Username}}" class="form-control"><br><br>
+                                <label for="">Admin Password</label>
+                                <input type="text" name="adminpswd" value="{{config.Admin_Password}}" class="form-control"><br><br>
+                                <button type="submit" class="btn btn-primary">Update</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
 
 
 

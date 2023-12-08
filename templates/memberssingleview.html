@@ -56,8 +56,8 @@
             </div> -->
             <form action="{%url 'ProfilephotoUpdate' member.id %}" enctype="multipart/form-data" method="post">
               {% csrf_token %}
-            <input type="file" name="photo" class="text-black mt-3 d-block font-weight-medium h6">
-            <button type="submit" class="btn btn-info">Upload New Photo <i class="mdi mdi-chevron-right"></i></button>  
+            <input type="file" name="photo" required class="text-black mt-3 d-block font-weight-medium h6">
+            <button type="submit" class="btn btn-info">Upload New Photo</button>  
             </form>
           </div>
         </div>
@@ -239,6 +239,8 @@
                           Subscription </a>
                         <a data-bs-toggle="modal" data-bs-target="#staticBackdrop" class="btn btn-danger">Delete
                           Member</a>
+                          <br><br>
+                          <a href="{%url 'AddPaymentFromMemberTab' member.id %}" class="btn btn-outline-info">Add Payment</a>
                         <!-- Subscription Chnage Model start  -->
 
                         <!-- Subscription Chnage Model end  -->
@@ -266,7 +268,7 @@
 
                         <!-- end deletepopup ---------------- -->
 
-                        <br><br><br>
+                        <br><br>
                         <a href="{%url 'ExtendAccessToGate' member.id %}" class="btn btn-outline-warning">Extend
                           Access</a>
                         <a href="{%url 'BlockAccess' member.id %}" class="btn btn-outline-dark">Block Access</a>

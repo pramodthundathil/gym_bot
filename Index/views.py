@@ -6,6 +6,7 @@ from Members.models import Subscription_Period, Subscription, Batch_DB, TypeSubs
 from Members.forms import Subscription_PeriodForm, BatchForm, TypeSubsriptionForm
 from datetime import datetime, timedelta
 from django.utils import timezone
+from .models import ConfigarationDB
 
 this_month = timezone.now().month
 end_date = timezone.now()
@@ -60,6 +61,8 @@ def Setting_Module(request):
     batch = Batch_DB.objects.all()
     speriod = Subscription_Period.objects.all()
     Sub_type = TypeSubsription.objects.all()
+    config = ConfigarationDB.objects.get(id = 1)
+
 
     context = {
         "form":form,
@@ -67,7 +70,8 @@ def Setting_Module(request):
         "batch":batch,
         "speriod":speriod,
         "typesub_form":typesub_form,
-        "Sub_type":Sub_type
+        "Sub_type":Sub_type,
+        "config":config
     }
     return  render(request, "settings.html",context)
 
@@ -146,6 +150,28 @@ def ChangePassword(request):
 
     return redirect("Setting_Module")
 
+def DeviceConfig(request,pk):
+    conf = ConfigarationDB.objects.get(id = pk)
+    if request.method == "POST":
+        jwt = request.POST["jwtip"]
+        jwt_port = request.POST["jwtport"]
+        callip = request.POST["callip"]
+        callport = request.POST["callport"]
+        adminusr = request.POST["adminusr"]
+        adminpswd = request.POST["adminpswd"]
+
+        conf.JWT_IP = jwt
+        conf.JWT_PORT = jwt_port
+        conf.Call_Back_IP = callip
+        conf.Call_Back_Port = callport
+        conf.Admin_Username = adminusr
+        conf.Admin_Password = adminpswd
+
+        conf.save()
+        messages.success(request,"Configuration data updated..")
+        return redirect("Setting_Module")
+
+    return redirect("Setting_Module")
 
     
     

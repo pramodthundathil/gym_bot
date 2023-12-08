@@ -6,6 +6,11 @@ from datetime import datetime, timedelta
 from django.utils import timezone
 from django.http import HttpResponse
 import csv
+from Index.models import ConfigarationDB
+# import requests
+import requests
+import json
+
 
 this_month = timezone.now().month
 today = timezone.now()
@@ -236,6 +241,49 @@ def Payments(request):
     }
     return render(request, "payments.html",context)
 
+def AddPaymentFromMemberTab(request,pk):
+    member = MemberData.objects.get(id = pk)
+    if request.method == "POST":
+        date = request.POST["pay_date"]
+        access = AccessToGate.objects.get(Member = member)
+        sub = Subscription.objects.get(Member = member)
+
+        payment = Payment.objects.create(Member = member,Payment_Date = date, Subscription_ID = sub,Amount = sub.Amount,Payment_Status = True,Access_status = True )
+        payment.save()
+        sub.Payment_Status = True
+        sub.save()
+        user = member
+        user.Access_status = True
+        user.save()
+
+        try:
+            sub_date = request.POST["sub_extendate"]
+            access.Validity_Date = sub_date
+            access.save()
+
+        except:
+            sub_date = sub.Subscription_End_Date
+            access.Validity_Date = sub_date
+            access.save()
+            
+        sub.Subscription_End_Date = sub_date
+        sub.save()
+        if AccessToGate.objects.filter(Validity_Date__gte = today, Member = payment.Member ).exists():
+            access.Status = True 
+            access.Payment_status = True
+        else:
+            access.Status = False 
+        access.save()
+        messages.success(request,"Payment Updated for member {}".format(user))
+        return redirect("MembersSingleView",pk)
+
+    context ={
+        "member":member
+    }
+    # messages.success(request, "Payment Added")
+    return render(request,"paymentaddsingle.html",context)
+
+
 def DeletePayment(request,pk):
     Pay = Payment.objects.get(id = pk).delete()
     messages.info(request,"Payment Deleted")
@@ -243,12 +291,15 @@ def DeletePayment(request,pk):
 
 def ExtendAccessToGate(request,pk):
     member = MemberData.objects.get(id = pk)
+    subscrib = Subscription.objects.get(Member = member)
     if request.method == "POST":
         extention = request.POST['exend']
         access = AccessToGate.objects.get(Member = member)
         access.Validity_Date = extention
         access.Status = True
         access.save()
+        subscrib.Subscription_End_Date = extention
+        subscrib.save()
         messages.success(request, "Access Granded Till {}".format(extention))
         return redirect(MembersSingleView, pk)
     context = {
@@ -388,6 +439,74 @@ def PaymentReportMonth(request):
         return response
     except:
         return HttpResponse("No Valid Fiels")
+
+def ScheduledTask():
+
+    confdata = ConfigarationDB.objects.get(id = 1)
+
+    # get jwt token on local host Ztehodevice 
+    url = f'http://{confdata.JWT_IP}:{confdata.JWT_PORT}/jwt-api-token-auth/'
+    print(url)
+    header1 = {
+        'Content-Type': 'application/json'
+        }
+    token = "nil"
+    body = {
+        "username": confdata.Admin_Username,
+        "password": confdata.Admin_Password
+    }
+    json_payload = json.dumps(body)
+    try:
+        reponse = requests.post(url,headers = header1,data = json_payload)
+        if response.status_code == 200:
+            print('Request successful!')
+            token_dict = json.load(response)
+            token = token_dict['token']
+            print(response.json())
+        else:
+            print("no connection")
+
+    except:
+        print("No connection")
+    
+    headers = {
+        'Content-Type': 'application/json',
+        'Authorization': 'JWT {}'.format(token)
+    }
+
+    subscrib = Subscription.objects.filter(Subscription_End_Date__lte = end_date)
+    for i in subscrib:
+        i.Payment_Status = False
+        i.save()
+        # print("hrlloooooooooooo")
+        access = AccessToGate.objects.get(Subscription = i)
+        access.Status = False
+        access.save() 
+
+    acc = AccessToGate.objects.all()
+    for i in acc:
+        if i.Status == False:
+            accessid = i.Member.Access_Token_Id
+            url = f"http://{confdata.Call_Back_IP}:{confdata.Call_Back_Port}/personal/api/employees/{accessid}/"
+            print(url)
+            data = {
+                "enable_att":False
+            }
+            json_payload = json.dumps(data)
+            try:
+                respose = request.patch(url, hedders = headers, data = json_payload)
+                if respose.status_code == 200:
+                    print("Succeed...")
+                else:
+                    print("Failed.....")
+            except:
+                print("no connection")
+    
+    print("workinggggg.....")
+
+            
+
+    
     
 
 

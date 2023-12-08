@@ -14,6 +14,8 @@ urlpatterns = [
     path("SubScriptionType_Delete/<int:pk>",views.SubScriptionType_Delete,name="SubScriptionType_Delete"),  
     path("ChangePassword",views.ChangePassword,name="ChangePassword"),
     path("Search",views.Search,name="Search"),
+    path("DeviceConfig/<int:pk>",views.DeviceConfig,name="DeviceConfig"),  
+
 
 
 ]

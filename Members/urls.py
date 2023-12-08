@@ -16,6 +16,7 @@ urlpatterns = [
     path("ProfilephotoUpdate/<int:pk>",views.ProfilephotoUpdate,name="ProfilephotoUpdate"),
     path("AllMembers",views.AllMembers,name="AllMembers"),
     path("AllPayments",views.AllPayments,name="AllPayments"),
+    path("AddPaymentFromMemberTab/<int:pk>",views.AddPaymentFromMemberTab,name="AddPaymentFromMemberTab"),
     
     
     path("FullMemberReport",views.FullMemberReport,name="FullMemberReport"),
@@ -24,6 +25,8 @@ urlpatterns = [
     path("DateWisePaymentReport",views.DateWisePaymentReport,name="DateWisePaymentReport"),
     path("PaymentReport",views.PaymentReport,name="PaymentReport"),
     path("PaymentReportMonth",views.PaymentReportMonth,name="PaymentReportMonth"),
+
+
 
     
 ]

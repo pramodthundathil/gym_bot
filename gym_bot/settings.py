@@ -13,7 +13,7 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 from pathlib import Path
 import os
 from django.contrib.messages import constants as messages
-import pymysql
+# import pymysql
 
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -27,9 +27,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-s4rl+10k(%fwat^#btz*&ocjf*v@1$c4ra246%482y2_f$gjc5'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["*"]
 
 
 # Application definition
@@ -44,6 +44,8 @@ INSTALLED_APPS = [
     'Index.apps.IndexConfig',
     'Members.apps.MembersConfig',
 ]
+
+
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -87,23 +89,14 @@ WSGI_APPLICATION = 'gym_bot.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
 
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.sqlite3',
-#         'NAME': BASE_DIR / 'db.sqlite3',
-#     }
-# }
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
+    }
+}
 
-CONN = pymysql.connect(
-    host="localhost",
-    user="root",
-    password="",
-    db="gym",
-    port= 3306,
-    # port= 3306,
-    cursorclass=pymysql.cursors.DictCursor
-        )
-CUR = CONN.cursor()
+
 
 
 # Password validation
@@ -130,7 +123,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Asia/Dubai'
 
 USE_I18N = True
 
