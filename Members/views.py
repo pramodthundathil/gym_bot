@@ -16,6 +16,7 @@ this_month = timezone.now().month
 today = timezone.now()
 start_date = today + timedelta(days=-5)
 end_date = today + timedelta(days=5)
+resign_date = today +timedelta(days = -30)
 
 notification_payments = Payment.objects.filter(Payment_Date__gte = start_date,Payment_Date__lte = today,Payment_Date = today )
 
@@ -487,10 +488,14 @@ def ScheduledTask():
     for i in acc:
         if i.Status == False:
             accessid = i.Member.Access_Token_Id
-            url = f"http://{confdata.Call_Back_IP}:{confdata.Call_Back_Port}/personal/api/employees/{accessid}/"
+            url = f"http://{confdata.Call_Back_IP}:{confdata.Call_Back_Port}/personal/api/resigns/"
             print(url)
             data = {
-                "enable_att":False
+                "employee":{{accessid}},
+                "disableatt":True,
+                "resign_type":1,
+                "resign_date":resign_date,
+                "reason":"Payment Pending",
             }
             json_payload = json.dumps(data)
             try:
@@ -501,6 +506,23 @@ def ScheduledTask():
                     print("Failed.....")
             except:
                 print("no connection")
+        else:
+            accessid = i.Member.Access_Token_Id
+            url = f"http://{confdata.Call_Back_IP}:{confdata.Call_Back_Port}/personal/api/resigns/reinstatement/"
+            print(url)
+            data = {
+                "resigns":[accessid]
+            }
+            json_payload = json.dumps(data)
+            try:
+                respose = request.patch(url, hedders = headers, data = json_payload)
+                if respose.status_code == 200:
+                    print("Succeed...")
+                else:
+                    print("Failed.....")
+            except:
+                print("no connection")
+
     
     print("workinggggg.....")
 
