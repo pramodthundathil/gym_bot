@@ -7,6 +7,7 @@ from Members.forms import Subscription_PeriodForm, BatchForm, TypeSubsriptionFor
 from datetime import datetime, timedelta
 from django.utils import timezone
 from .models import ConfigarationDB
+from Members.views import ScheduledTask
 
 this_month = timezone.now().month
 end_date = timezone.now()
@@ -39,7 +40,8 @@ def Home(request):
     payment = Payment.objects.filter(Payment_Date__month = this_month)
     for i in payment:
         collected_amount += i.Amount
-    
+        
+    ScheduledTask()
     context = {
         "subscribers":subscribers,
         "membercount":members.count(),

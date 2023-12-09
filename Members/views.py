@@ -20,6 +20,95 @@ resign_date = today +timedelta(days = -30)
 
 notification_payments = Payment.objects.filter(Payment_Date__gte = start_date,Payment_Date__lte = today,Payment_Date = today )
 
+def ScheduledTask():
+
+    confdata = ConfigarationDB.objects.get(id = 1)
+
+    # get jwt token on local host Ztehodevice 
+    url = f'http://{confdata.JWT_IP}:{confdata.JWT_PORT}/jwt-api-token-auth/'
+    print(url)
+    header1 = {
+        'Content-Type': 'application/json'
+        }
+    token = "nil"
+    body = {
+        "username": confdata.Admin_Username,
+        "password": confdata.Admin_Password
+    }
+    json_payload = json.dumps(body)
+    try:
+        reponse = requests.post(url,headers = header1,data = json_payload)
+        if response.status_code == 200:
+            print('Request successful!')
+            token_dict = json.load(response)
+            token = token_dict['token']
+            print(response.json())
+        else:
+            print("no connection")
+
+    except:
+        print("No connection")
+    
+    headers = {
+        'Content-Type': 'application/json',
+        'Authorization': 'JWT {}'.format(token)
+    }
+
+    subscrib = Subscription.objects.filter(Subscription_End_Date__lte = end_date)
+    for i in subscrib:
+        i.Payment_Status = False
+        i.save()
+        # print("hrlloooooooooooo")
+        access = AccessToGate.objects.get(Subscription = i)
+        access.Status = False
+        access.save() 
+
+    acc = AccessToGate.objects.all()
+    for i in acc:
+        if i.Status == False:
+            accessid = i.Member.Access_Token_Id
+            url = f"http://{confdata.Call_Back_IP}:{confdata.Call_Back_Port}/personal/api/resigns/"
+            print(url)
+            data = {
+                "employee":accessid,
+                "disableatt":True,
+                "resign_type":1,
+                "resign_date":str(resign_date),
+                "reason":"Payment Pending",
+            }
+            json_payload = json.dumps(data)
+            try:
+                respose = request.patch(url, hedders = headers, data = json_payload)
+                if respose.status_code == 200:
+                    print("Succeed...")
+                else:
+                    print("Failed.....")
+            except:
+                print("no connection")
+        else:
+            accessid = i.Member.Access_Token_Id
+            url = f"http://{confdata.Call_Back_IP}:{confdata.Call_Back_Port}/personal/api/resigns/reinstatement/"
+            print(url)
+            data = {
+                "resigns":[accessid]
+            }
+            json_payload = json.dumps(data)
+            try:
+                respose = request.patch(url, hedders = headers, data = json_payload)
+                if respose.status_code == 200:
+                    print("Succeed...")
+                else:
+                    print("Failed.....")
+            except:
+                print("no connection")
+
+    
+    print("workinggggg.....")
+
+            
+
+    
+    
 
 # member configarations and subscription add on same method 
 # one forign key field is prent in subscription Meber forign key, priod forign key, Batch forgin key
@@ -70,7 +159,7 @@ def MembersSingleView(request,pk):
     subscription = Subscription.objects.get(Member = member)
     access = AccessToGate.objects.get(Member = member)
     sub_form = SubscriptionAddForm()
-    
+    ScheduledTask()
 
     context = {
         "member":member,
@@ -225,6 +314,7 @@ def Payments(request):
             else:
                 access.Status = False 
             access.save()
+            ScheduledTask()
             messages.success(request,"Payment Updated for member {}".format(user))
             return redirect("Payments")
         else:
@@ -275,6 +365,7 @@ def AddPaymentFromMemberTab(request,pk):
         else:
             access.Status = False 
         access.save()
+        ScheduledTask()
         messages.success(request,"Payment Updated for member {}".format(user))
         return redirect("MembersSingleView",pk)
 
@@ -441,95 +532,6 @@ def PaymentReportMonth(request):
     except:
         return HttpResponse("No Valid Fiels")
 
-def ScheduledTask():
-
-    confdata = ConfigarationDB.objects.get(id = 1)
-
-    # get jwt token on local host Ztehodevice 
-    url = f'http://{confdata.JWT_IP}:{confdata.JWT_PORT}/jwt-api-token-auth/'
-    print(url)
-    header1 = {
-        'Content-Type': 'application/json'
-        }
-    token = "nil"
-    body = {
-        "username": confdata.Admin_Username,
-        "password": confdata.Admin_Password
-    }
-    json_payload = json.dumps(body)
-    try:
-        reponse = requests.post(url,headers = header1,data = json_payload)
-        if response.status_code == 200:
-            print('Request successful!')
-            token_dict = json.load(response)
-            token = token_dict['token']
-            print(response.json())
-        else:
-            print("no connection")
-
-    except:
-        print("No connection")
-    
-    headers = {
-        'Content-Type': 'application/json',
-        'Authorization': 'JWT {}'.format(token)
-    }
-
-    subscrib = Subscription.objects.filter(Subscription_End_Date__lte = end_date)
-    for i in subscrib:
-        i.Payment_Status = False
-        i.save()
-        # print("hrlloooooooooooo")
-        access = AccessToGate.objects.get(Subscription = i)
-        access.Status = False
-        access.save() 
-
-    acc = AccessToGate.objects.all()
-    for i in acc:
-        if i.Status == False:
-            accessid = i.Member.Access_Token_Id
-            url = f"http://{confdata.Call_Back_IP}:{confdata.Call_Back_Port}/personal/api/resigns/"
-            print(url)
-            data = {
-                "employee":accessid,
-                "disableatt":True,
-                "resign_type":1,
-                "resign_date":str(resign_date),
-                "reason":"Payment Pending",
-            }
-            json_payload = json.dumps(data)
-            try:
-                respose = request.patch(url, hedders = headers, data = json_payload)
-                if respose.status_code == 200:
-                    print("Succeed...")
-                else:
-                    print("Failed.....")
-            except:
-                print("no connection")
-        else:
-            accessid = i.Member.Access_Token_Id
-            url = f"http://{confdata.Call_Back_IP}:{confdata.Call_Back_Port}/personal/api/resigns/reinstatement/"
-            print(url)
-            data = {
-                "resigns":[accessid]
-            }
-            json_payload = json.dumps(data)
-            try:
-                respose = request.patch(url, hedders = headers, data = json_payload)
-                if respose.status_code == 200:
-                    print("Succeed...")
-                else:
-                    print("Failed.....")
-            except:
-                print("no connection")
-
-    
-    print("workinggggg.....")
-
-            
-
-    
-    
 
 
 
