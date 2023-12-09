@@ -494,7 +494,7 @@ def ScheduledTask():
                 "employee":accessid,
                 "disableatt":True,
                 "resign_type":1,
-                "resign_date":resign_date,
+                "resign_date":str(resign_date),
                 "reason":"Payment Pending",
             }
             json_payload = json.dumps(data)
