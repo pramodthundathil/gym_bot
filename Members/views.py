@@ -491,7 +491,7 @@ def ScheduledTask():
             url = f"http://{confdata.Call_Back_IP}:{confdata.Call_Back_Port}/personal/api/resigns/"
             print(url)
             data = {
-                "employee":{{accessid}},
+                "employee":accessid,
                 "disableatt":True,
                 "resign_type":1,
                 "resign_date":resign_date,
