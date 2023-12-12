@@ -317,7 +317,6 @@ def Payments(request):
                 access.Status = False 
             access.save()
             ScheduledTask()
-            ReceiptGenerate(request)
             messages.success(request,"Payment Updated for member {}".format(user))
             return redirect("Payments")
         else:
@@ -380,9 +379,9 @@ def AddPaymentFromMemberTab(request,pk):
 
 # creating receipt for payment 
 
-def ReceiptGenerate(request):
+def ReceiptGenerate(request,pk):
     template_path = "receipt.html"
-    content = {
+    context = {
         'myvar':"this is your template content"
     }
     response = HttpResponse(content_type = "application/pdf")

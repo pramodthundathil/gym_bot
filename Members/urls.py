@@ -25,7 +25,7 @@ urlpatterns = [
     path("DateWisePaymentReport",views.DateWisePaymentReport,name="DateWisePaymentReport"),
     path("PaymentReport",views.PaymentReport,name="PaymentReport"),
     path("PaymentReportMonth",views.PaymentReportMonth,name="PaymentReportMonth"),
-    path("ReceiptGenerate",views.ReceiptGenerate,name="ReceiptGenerate")
+    path("ReceiptGenerate,<int:pk>",views.ReceiptGenerate,name="ReceiptGenerate")
 
 
 
