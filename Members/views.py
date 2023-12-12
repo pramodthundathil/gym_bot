@@ -570,7 +570,8 @@ def PaymentReportMonth(request):
 
 
 def PDFprintFullMemberReport(request):
-
+    date = timezone.now().month
+    date_year = timezone.now().year
     member = MemberData.objects.all()
     template_path = "reportpdf_fulldata.html"
 
