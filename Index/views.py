@@ -8,6 +8,7 @@ from datetime import datetime, timedelta
 from django.utils import timezone
 from .models import ConfigarationDB
 from Members.views import ScheduledTask
+from .decorator import unautenticated_user
 
 this_month = timezone.now().month
 end_date = timezone.now()
@@ -178,7 +179,7 @@ def DeviceConfig(request,pk):
     
     
 
-
+@unautenticated_user
 def SignIn(request):
     if request.method == "POST":
         uname = request.POST['uname']
