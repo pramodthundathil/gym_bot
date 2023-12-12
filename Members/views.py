@@ -571,7 +571,7 @@ def PaymentReportMonth(request):
 
 def PDFprintFullMemberReport(request):
 
-    member = MemberData.obejects.all()
+    member = MemberData.objects.all()
     template_path = "reportpdf_fulldata.html"
 
     context = {
