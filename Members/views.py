@@ -380,9 +380,25 @@ def AddPaymentFromMemberTab(request,pk):
 # creating receipt for payment 
 
 def ReceiptGenerate(request,pk):
+
+    payment  = Payment.objects.get(id = pk)
+    member = payment.Member
+    amount  = payment.Amount
+    payid  = pk
+    payment_date = payment.Payment_Date
+    sub_start = payment.Subscription_ID.Subscribed_Date
+    sub_end = payment.Subscription_ID.Subscription_End_Date
+    period = payment.Subscription_ID.Period_Of_Subscription
     template_path = "receipt.html"
+
     context = {
-        'myvar':"this is your template content"
+       "member":member,
+       "amount":amount,
+       "payid":payid,
+       "payment_date":payment_date,
+       "sub_start":sub_start,
+       "sub_end":sub_end,
+       "period":period
     }
     response = HttpResponse(content_type = "application/pdf")
     response['Content-Disposition'] = 'attachment; filename="payment_receipt.pdf"'
