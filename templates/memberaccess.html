@@ -26,7 +26,7 @@
                         <h4 class="card-title">Generate Member Report</h4>
                         <p class="card-description">Generate Report
 
-                            <a href="{%url 'PDFprintFullMemberReport' %}" type="button" class="btn btn-sm bg-white btn-icon-text border ml-3">
+                            <a href="{%url 'PDFprintFullMemberReport' %}" target="_blank" type="button" class="btn btn-sm bg-white btn-icon-text border ml-3">
                             <i class="mdi mdi-printer btn-icon-prepend"></i> Print </a>
                         </p>
                         <div class="form-group row">
@@ -48,7 +48,10 @@
                 <div class="card">
                     <div class="card-body">
                         <h4 class="card-title">Member Report</h4>
-                        <p class="card-description">Date Wise Member Report</p>
+                        <p class="card-description">Date Wise Member Report
+
+                          
+                        </p>
                             <form action="{%url 'DateWiseMemberReport' %}" method="post">
                         <div class="form-group row">
 
@@ -77,8 +80,11 @@
             <div class="col-md-6 grid-margin stretch-card">
                 <div class="card">
                     <div class="card-body">
-                        <h4 class="card-title">Generate Paymet Report</h4>
-                        <p class="card-description">Generate Report</p>
+                        <h4 class="card-title">Generate Payment Report</h4>
+                        <p class="card-description">Generate Report
+                            <a href="{%url 'PDFprintFullPaymentReport' %}" target="_blank" type="button" class="btn btn-sm bg-white btn-icon-text border ml-3">
+                                <i class="mdi mdi-printer btn-icon-prepend"></i> Print </a>
+                        </p>
                         <div class="form-group row">
                             <div class="col">
                                 

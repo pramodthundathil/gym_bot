@@ -590,6 +590,27 @@ def PDFprintFullMemberReport(request):
     return response
 
 
+def PDFprintFullPaymentReport(request):
+    date = timezone.now().month
+    date_year = timezone.now().year
+    payment = Payment.objects.all()
+    template_path = "reportpdf_fulldata_payment.html"
+
+    context = {
+       "payment":payment
+    }
+    response = HttpResponse(content_type = "application/pdf")
+    response['Content-Disposition'] = "filename=Paymentreportfull{}-{}.pdf".format(date,date_year)
+    template = get_template(template_path)
+    html = template.render(context)
+
+    # create PDF
+    pisa_status = pisa.CreatePDF(html, dest = response)
+    if pisa_status.err:
+        return HttpResponse("we are some erros <pre>" + html + '</pre>')
+    return response
+
+
 
 
 

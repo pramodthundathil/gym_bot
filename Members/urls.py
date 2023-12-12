@@ -27,6 +27,7 @@ urlpatterns = [
     path("PaymentReportMonth",views.PaymentReportMonth,name="PaymentReportMonth"),
     path("ReceiptGenerate,<int:pk>",views.ReceiptGenerate,name="ReceiptGenerate"),
     path("PDFprintFullMemberReport",views.PDFprintFullMemberReport,name="PDFprintFullMemberReport"),
+    path("PDFprintFullPaymentReport",views.PDFprintFullPaymentReport,name="PDFprintFullPaymentReport"),
 
     
 
