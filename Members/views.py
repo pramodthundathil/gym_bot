@@ -578,7 +578,7 @@ def PDFprintFullMemberReport(request):
        "member":member
     }
     response = HttpResponse(content_type = "application/pdf")
-    response['Content-Disposition'] = 'filename="Memberreportfull{}-{}.pdf".format(date,date_year)'
+    response['Content-Disposition'] = "filename=Memberreportfull{}-{}.pdf".format(date,date_year)
     template = get_template(template_path)
     html = template.render(context)
 
