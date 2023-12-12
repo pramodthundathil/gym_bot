@@ -6,6 +6,8 @@ from datetime import datetime, timedelta
 from django.utils import timezone
 from django.http import HttpResponse
 import csv
+from django.template.loader import get_template
+from xhtml2pdf import pisa
 from Index.models import ConfigarationDB
 # import requests
 import requests
@@ -315,6 +317,7 @@ def Payments(request):
                 access.Status = False 
             access.save()
             ScheduledTask()
+            ReceiptGenerate(request)
             messages.success(request,"Payment Updated for member {}".format(user))
             return redirect("Payments")
         else:
@@ -375,6 +378,23 @@ def AddPaymentFromMemberTab(request,pk):
     # messages.success(request, "Payment Added")
     return render(request,"paymentaddsingle.html",context)
 
+# creating receipt for payment 
+
+def ReceiptGenerate(request):
+    template_path = "receipt.html"
+    content = {
+        'myvar':"this is your template content"
+    }
+    response = HttpResponse(content_type = "application/pdf")
+    response['Content-Disposition'] = 'attachment; filename="payment_receipt.pdf"'
+    template = get_template(template_path)
+    html = template.render(context)
+
+    # create PDF
+    pisa_status = pisa.CreatePDF(html, dest = response)
+    if pisa_status.err:
+        return HttpResponse("we are some erros <pre>" + html + '</pre>')
+    return response
 
 def DeletePayment(request,pk):
     Pay = Payment.objects.get(id = pk).delete()
