@@ -7,9 +7,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Payement Receipt</title>
     <style>
+        .container{
+            display: flex;
+            justify-content: space-evenly;
+        }
+        .item{
+            width:450px;
+            height: auto;
+        }
         body {
             font-family: Arial, Helvetica, sans-serif;
-            width:350px !important;
+            width: 350px !important;
         }
 
         p {
@@ -20,7 +28,7 @@
             width: 350px;
             padding: 10px;
             margin: auto;
-            
+
         }
 
         .center-h6 {
@@ -37,90 +45,102 @@
         .card-body h4 {
             color: blue
         }
-        .card-body table{
+
+        .card-body table {
             width: 100%;
 
         }
-        .card-body th{
+
+        .card-body th {
             text-align: left;
         }
-        .card-body td{
+
+        .card-body td {
             text-align: right;
         }
     </style>
 </head>
 
 <body>
-    <div class="receipt">
-        <div class="card-head">
-            <h3 style="color: blue;">BODY FORCE FITNESS CENTER</h3>
-            <p>KHALEEFA STREET ALAIN</p>
-            <P>AL AIN</P>
-            <P>UNITED ARAB EMIRATES</P>
-            <table style="width:100%; text-align:left">
-                <tr>
-                    <th>Phone:</th>
-                    <td>+971-543374500, +971-509372181</td>
-                </tr>
-                <tr>
-                    <th>Fax:</th>
-                    <td>+971-567767285</td>
-                </tr>
-                <tr>
-                    <th>E-mail:</th>
-                    <td>bodyforcealine@gmail.com</td>
-                </tr>
-                <tr>
-                    <th>Web:</th>
-                    <td>www.bodyforcealain.com</td>
-                </tr>
-            </table>
-            <h5 style="text-align: center;">VAT #000000</h5>
-            <h6>VAT RECEIPT # {{payid}}</h6>
-        </div>
-
-        <h6 class="center-h6" style="text-align: center;"><span>{{payid}} #</span> <span>{{member}}</span></h6>
-
-        <div class="card-body">
-            <h4 style="color: blue;">Package:</h4>
-            <p>{{period}}</p>
-            <p>{{payid}}# month from {{payment_date}} to {{sub_end}} </p>
-
-            <br><br><br>
-
-            <h4>From: <span style="color: black;font-weight:200 ;">{{payment_date}}</span></h4>
-            <h4>to: <span style="color: black;font-weight:200 ;">{{sub_end}}</span></h4>
-
-            <br><br>
-            <table>
-                <tr>
-                    <th>
-                        <h4>Amount:</h4>
-                    </th>
-                    <td>
-                        <span style="color: black;font-weight:200 ;">AED {{amount}}</span>
-                    </td>
-                </tr>
-                <tr>
-                    <th>
-                        <h4>Vat%:</h4>
-                    </th>
-                    <td>
-                        <span style="color: black;font-weight:200 ;">AED 0.00</span>
-                    </td>
-                </tr>
-                <tr>
-                    <th>
-                        <h4>Total: </h4>
-                    </th>
-                    <td>
-                        <span style="color: black;font-weight:200 ;">AED {{amount}}</span>
-                    </td>
-                </tr>
-            </table>
+    <div class="container">
+        <div class="item">
 
         </div>
+        <div class="receipt item">
+            <div class="card-head">
+                <h3 style="color: blue;">BODY FORCE FITNESS CENTER</h3>
+                <p>KHALEEFA STREET ALAIN</p>
+                <P>AL AIN</P>
+                <P>UNITED ARAB EMIRATES</P>
+                <table style="width:100%; text-align:left">
+                    <tr>
+                        <th>Phone:</th>
+                        <td>+971-543374500, +971-509372181</td>
+                    </tr>
+                    <tr>
+                        <th>Fax:</th>
+                        <td>+971-567767285</td>
+                    </tr>
+                    <tr>
+                        <th>E-mail:</th>
+                        <td>bodyforcealine@gmail.com</td>
+                    </tr>
+                    <tr>
+                        <th>Web:</th>
+                        <td>www.bodyforcealain.com</td>
+                    </tr>
+                </table>
+                <h5 style="text-align: center;">VAT #000000</h5>
+                <h6>VAT RECEIPT # {{payid}}</h6>
+                <p>{{payment_date}}</p>
+            </div>
 
+            <h6 class="center-h6" style="text-align: center;"><span>{{payid}} #</span> <span>{{member}}</span></h6>
+
+            <div class="card-body">
+                <h4 style="color: blue;">Package:</h4>
+                <p>{{period}}</p>
+                <p>{{payid}}# month from {{payment_date}} to {{sub_end}} </p>
+
+                <br><br><br>
+
+                <h4>From: <span style="color: black;font-weight:200 ;">{{payment_date}}</span></h4>
+                <h4>to: <span style="color: black;font-weight:200 ;">{{sub_end}}</span></h4>
+
+                <br><br>
+                <table>
+                    <tr>
+                        <th>
+                            <h4>Amount:</h4>
+                        </th>
+                        <td>
+                            <span style="color: black;font-weight:200 ;">AED {{amount}}</span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>
+                            <h4>Vat%:</h4>
+                        </th>
+                        <td>
+                            <span style="color: black;font-weight:200 ;">AED 0.00</span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>
+                            <h4>Total: </h4>
+                        </th>
+                        <td>
+                            <span style="color: black;font-weight:200 ;">AED {{amount}}</span>
+                        </td>
+                    </tr>
+                </table>
+
+            </div>
+
+        </div>
+        <div class="item">
+
+        </div>
     </div>
 </body>
 

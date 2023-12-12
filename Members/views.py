@@ -402,7 +402,7 @@ def ReceiptGenerate(request,pk):
        "pk":pk,
     }
     response = HttpResponse(content_type = "application/pdf")
-    response['Content-Disposition'] = 'attachment; filename="payment_receipt.pdf"'
+    response['Content-Disposition'] = 'filename=f"payment_receipt_{member}.pdf"'
     template = get_template(template_path)
     html = template.render(context)
 
