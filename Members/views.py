@@ -569,6 +569,27 @@ def PaymentReportMonth(request):
         return HttpResponse("No Valid Fiels")
 
 
+def PDFprintFullMemberReport(request):
+
+    member = MemberData.obejects.all()
+    template_path = "reportpdf_fulldata.html"
+
+    context = {
+       "member":member
+    }
+    response = HttpResponse(content_type = "application/pdf")
+    response['Content-Disposition'] = 'filename="Memberreportfull{}-{}.pdf".format(date,date_year)'
+    template = get_template(template_path)
+    html = template.render(context)
+
+    # create PDF
+    pisa_status = pisa.CreatePDF(html, dest = response)
+    if pisa_status.err:
+        return HttpResponse("we are some erros <pre>" + html + '</pre>')
+    return response
+
+
+
 
 
 

@@ -24,16 +24,18 @@
                 <div class="card">
                     <div class="card-body">
                         <h4 class="card-title">Generate Member Report</h4>
-                        <p class="card-description">Generate Report</p>
+                        <p class="card-description">Generate Report
+
+                            <a href="{%url 'PDFprintFullMemberReport' %}" type="button" class="btn btn-sm bg-white btn-icon-text border ml-3">
+                            <i class="mdi mdi-printer btn-icon-prepend"></i> Print </a>
+                        </p>
                         <div class="form-group row">
                             <div class="col">
-                                
                                 <div id="the-basics">
                                     <a href="{%url 'FullMemberReport' %}" class="btn btn-outline-info">Full Member Reports</a>
                                 </div>
                             </div>
                             <div class="col">
-                                
                                 <div id="bloodhound">
                                     <a href="{%url 'MonthMemberReport' %}" class="btn btn-outline-warning">Report on This Month</a>
                                 </div>
