@@ -398,7 +398,8 @@ def ReceiptGenerate(request,pk):
        "payment_date":payment_date,
        "sub_start":sub_start,
        "sub_end":sub_end,
-       "period":period
+       "period":period,
+       "pk":pk,
     }
     response = HttpResponse(content_type = "application/pdf")
     response['Content-Disposition'] = 'attachment; filename="payment_receipt.pdf"'

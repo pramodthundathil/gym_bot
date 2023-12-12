@@ -19,7 +19,7 @@
             width: 350px;
             padding: 10px;
             margin: auto;
-            border: 1px solid black;
+            
         }
 
         .center-h6 {
@@ -78,12 +78,12 @@
             <h6>VAT RECEIPT # {{payid}}</h6>
         </div>
 
-        <h6 class="center-h6" style="text-align: center;"><span>{{payid}}</span> <span>{{member}}</span></h6>
+        <h6 class="center-h6" style="text-align: center;"><span>{{payid}} #</span> <span>{{member}}</span></h6>
 
         <div class="card-body">
             <h4 style="color: blue;">Package:</h4>
             <p>{{period}}</p>
-            <p>{{payid}}# month from {{payment_date}} to </p>
+            <p>{{payid}}# month from {{payment_date}} to {{sub_end}} </p>
 
             <br><br><br>
 
