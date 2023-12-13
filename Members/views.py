@@ -13,6 +13,7 @@ from Index.models import ConfigarationDB
 import requests
 import json
 from django.contrib.auth.decorators import login_required
+from Index.models import Logo
 
 
 
@@ -394,7 +395,7 @@ def AddPaymentFromMemberTab(request,pk):
 
 @login_required(login_url='SignIn')
 def ReceiptGenerate(request,pk):
-
+    logo = Logo.objects.get(id = 1)
     payment  = Payment.objects.get(id = pk)
     member = payment.Member
     amount  = payment.Amount
@@ -414,6 +415,7 @@ def ReceiptGenerate(request,pk):
        "sub_end":sub_end,
        "period":period,
        "pk":pk,
+       "logo":logo
     }
     response = HttpResponse(content_type = "application/pdf")
     response['Content-Disposition'] = 'filename=f"payment_receipt_{member}.pdf"'

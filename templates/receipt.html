@@ -12,7 +12,7 @@
             justify-content: space-evenly;
         }
         .item{
-            width:450px;
+        
             height: auto;
         }
         body {
@@ -25,7 +25,6 @@
         }
 
         .receipt {
-            width: 350px;
             padding: 10px;
             margin: auto;
 
@@ -70,23 +69,21 @@
         </div>
         <div class="receipt item">
             <div class="card-head">
+
+                <img src="{{logo.logo.url}}" width="50px;display:block;margin:auto;" alt="">
                 <h3 style="color: blue;">EMMY WOMAN BODY FITNESS</h3>
-                <p>VILLA-78 SULTHANBIN WIZAISH, AL DHAHARI St. AL MUWAIJI-OUD BIN SAG-HAN, BESIDE AL MA'MOUN MEDICAL CENTER</p>
-                <P>AL AIN</P>
+                <p>VILLA-78 SULTHANBIN WIZAISH, AL DHAHARI St. AL MUWAIJI-OUD BIN SAG-HAN, BESIDE AL MA'MOUN MEDICAL CENTER <br>
                 <P>UNITED ARAB EMIRATES</P>
-                <table style="width:100%; text-align:left">
-                    <tr>
-                        <th>Phone:</th>
-                        <td>03 7367119</td>
+                Phone:03 7367119,</td>
                     </tr>
                     <tr>
                         <th>MOB:</th>
-                        <td>+971-505084384</td>
+                        <td>+971-505084384,</td>
                     </tr>
                     
                     <tr>
                         <th>E-mail:</th>
-                        <td>emmybodyfitness@gmail.com</td>
+                        <td>emmybodyfitness@gmail.com,</td>
                     </tr>
                     <tr>
                         <th>Web:</th>
@@ -95,7 +92,7 @@
                 </table>
                 <h5 style="text-align: center;">VAT #000000</h5>
                 <h6>VAT RECEIPT # {{payid}}</h6>
-                <p>{{payment_date}}</p>
+                <p>Date: {{payment_date}}</p>
             </div>
 
             <h6 class="center-h6" style="text-align: center;"><span>{{payid}} #</span> <span>{{member}}</span></h6>
@@ -111,25 +108,25 @@
                         <th>
                             <h4>Amount:</h4>
                         </th>
-                        <td>
+                        <th>
                             <span style="color: black;font-weight:200 ;">AED {{amount}}</span>
-                        </td>
+                        </th>
                     </tr>
                     <tr>
                         <th>
                             <h4>Vat%:</h4>
                         </th>
-                        <td>
+                        <th>
                             <span style="color: black;font-weight:200 ;">AED 0.00</span>
-                        </td>
+                        </th>
                     </tr>
                     <tr>
                         <th>
                             <h4>Total: </h4>
                         </th>
-                        <td>
+                        <th>
                             <span style="color: black;font-weight:200 ;">AED {{amount}}</span>
-                        </td>
+                        </th>
                     </tr>
                 </table>
 

@@ -10,3 +10,7 @@ class ConfigarationDB(models.Model):
     Call_Back_Port = models.CharField(max_length=11)
     Admin_Username = models.CharField(max_length=255)
     Admin_Password = models.CharField(max_length=255) 
+
+class Logo(models.Model):
+    name = models.CharField(max_length=255)
+    logo = models.FileField(upload_to='logo')
