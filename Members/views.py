@@ -24,7 +24,7 @@ resign_date = today +timedelta(days = -30)
 
 notification_payments = Payment.objects.filter(Payment_Date__gte = start_date,Payment_Date__lte = today,Payment_Date = today )
 
-@login_required(login_url='SignIn')
+
 def ScheduledTask():
 
     confdata = ConfigarationDB.objects.get(id = 1)
