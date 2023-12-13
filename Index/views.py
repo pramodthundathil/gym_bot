@@ -9,12 +9,15 @@ from django.utils import timezone
 from .models import ConfigarationDB
 from Members.views import ScheduledTask
 from .decorator import unautenticated_user
+from django.contrib.auth.decorators import login_required
+
 
 this_month = timezone.now().month
 end_date = timezone.now()
 start_date = end_date + timedelta(days=-5)
 
 
+@login_required(login_url='SignIn')
 def Home(request):
     subscribers = Subscription.objects.all()[:8][::-1]
     members = MemberData.objects.all()
@@ -55,6 +58,7 @@ def Home(request):
 
     return render(request,"index.html",context)
 
+@login_required(login_url='SignIn')
 def Setting_Module(request):
 
     form = BatchForm()
@@ -78,6 +82,7 @@ def Setting_Module(request):
     }
     return  render(request, "settings.html",context)
 
+@login_required(login_url='SignIn')
 def BatchSave(request):
     if request.method == "POST":
         form = BatchForm(request.POST)
@@ -96,6 +101,7 @@ def Batch_Delete(request,pk):
     return redirect("Setting_Module")
 
 
+@login_required(login_url='SignIn')
 def SubscriptionPeriodSave(request):
     if request.method == "POST":
         form = Subscription_PeriodForm(request.POST)
@@ -108,6 +114,7 @@ def SubscriptionPeriodSave(request):
             return redirect("Setting_Module")
     return redirect("Setting_Module")
 
+@login_required(login_url='SignIn')
 def SubScriptionPeriod_Delete(request,pk):
     batch = Subscription_Period.objects.get(id = pk).delete()
     messages.success(request,"Subscription period Data Deleted")
@@ -125,12 +132,14 @@ def SubscriptionTypeSave(request):
             return redirect("Setting_Module")
     return redirect("Setting_Module")
 
+@login_required(login_url='SignIn')
 def SubScriptionType_Delete(request,pk):
     batch = TypeSubsription.objects.get(id = pk).delete()
     messages.success(request,"Subscription Type Deleted")
     return redirect("Setting_Module")
 
 
+@login_required(login_url='SignIn')
 def ChangePassword(request):
     if request.method == "POST":
         oldpass = request.POST["oldpassword"]
@@ -153,6 +162,7 @@ def ChangePassword(request):
 
     return redirect("Setting_Module")
 
+@login_required(login_url='SignIn')
 def DeviceConfig(request,pk):
     conf = ConfigarationDB.objects.get(id = pk)
     if request.method == "POST":
@@ -197,6 +207,7 @@ def SignOut(request):
     logout(request)
     return redirect(SignIn)
 
+@login_required(login_url='SignIn')
 def Search(request):
     if request.method == "POST":
         key = request.POST["key"]

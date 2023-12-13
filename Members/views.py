@@ -12,6 +12,8 @@ from Index.models import ConfigarationDB
 # import requests
 import requests
 import json
+from django.contrib.auth.decorators import login_required
+
 
 
 this_month = timezone.now().month
@@ -22,6 +24,7 @@ resign_date = today +timedelta(days = -30)
 
 notification_payments = Payment.objects.filter(Payment_Date__gte = start_date,Payment_Date__lte = today,Payment_Date = today )
 
+@login_required(login_url='SignIn')
 def ScheduledTask():
 
     confdata = ConfigarationDB.objects.get(id = 1)
@@ -115,6 +118,7 @@ def ScheduledTask():
 # member configarations and subscription add on same method 
 # one forign key field is prent in subscription Meber forign key, priod forign key, Batch forgin key
 #
+@login_required(login_url='SignIn')
 def Member(request):
     form = MemberAddForm()
     sub_form = SubscriptionAddForm()
@@ -156,6 +160,7 @@ def Member(request):
         }
     return render(request,"members.html",context)
 
+@login_required(login_url='SignIn')
 def MembersSingleView(request,pk):
     member = MemberData.objects.get(id = pk)
     subscription = Subscription.objects.get(Member = member)
@@ -173,6 +178,7 @@ def MembersSingleView(request,pk):
     }
     return render(request,"memberssingleview.html",context)
 
+@login_required(login_url='SignIn')
 def UpdateMember(request,pk):
     member = MemberData.objects.get(id = pk)
     if request.method == "POST":
@@ -197,6 +203,7 @@ def UpdateMember(request,pk):
 
     return redirect("MembersSingleView",pk)
 
+@login_required(login_url='SignIn')
 def ProfilephotoUpdate(request,pk):
     if request.method == "POST":
         file = request.FILES["photo"]
@@ -209,6 +216,7 @@ def ProfilephotoUpdate(request,pk):
     return redirect("MembersSingleView",pk)
     
 
+@login_required(login_url='SignIn')
 def UpdateAccessToken(request,pk):
     if request.method == "POST":
         newtoken = request.POST['newtkn']
@@ -220,6 +228,7 @@ def UpdateAccessToken(request,pk):
 
     return redirect("MembersSingleView",pk)
 
+@login_required(login_url='SignIn')
 def DeleteMember(request,pk):
     member = MemberData.objects.get(id=pk)
     member.Photo.delete()
@@ -227,11 +236,13 @@ def DeleteMember(request,pk):
     messages.error(request,"Member Data Deleted Success")
     return redirect("Member")
 
+@login_required(login_url='SignIn')
 def MemberAccess(request):
     return render(request,"memberaccess.html")
 
 
 
+@login_required(login_url='SignIn')
 def ChangeSubscription(request,pk):
     print("function Started..................")
     sub_form = SubscriptionAddForm()
@@ -271,6 +282,7 @@ def ChangeSubscription(request,pk):
     return render(request,'changesubscription.html',context)
         
             
+@login_required(login_url='SignIn')
 def Payments(request):
     form = PaymentForm()
     pay = Payment.objects.all()[:8][::-1]
@@ -334,6 +346,7 @@ def Payments(request):
     }
     return render(request, "payments.html",context)
 
+@login_required(login_url='SignIn')
 def AddPaymentFromMemberTab(request,pk):
     member = MemberData.objects.get(id = pk)
     if request.method == "POST":
@@ -379,6 +392,7 @@ def AddPaymentFromMemberTab(request,pk):
 
 # creating receipt for payment 
 
+@login_required(login_url='SignIn')
 def ReceiptGenerate(request,pk):
 
     payment  = Payment.objects.get(id = pk)
@@ -412,11 +426,13 @@ def ReceiptGenerate(request,pk):
         return HttpResponse("we are some erros <pre>" + html + '</pre>')
     return response
 
+@login_required(login_url='SignIn')
 def DeletePayment(request,pk):
     Pay = Payment.objects.get(id = pk).delete()
     messages.info(request,"Payment Deleted")
     return redirect("Payments")
 
+@login_required(login_url='SignIn')
 def ExtendAccessToGate(request,pk):
     member = MemberData.objects.get(id = pk)
     subscrib = Subscription.objects.get(Member = member)
@@ -436,6 +452,7 @@ def ExtendAccessToGate(request,pk):
     }  
     return render(request,"grandaccessforgate.html",context)
 
+@login_required(login_url='SignIn')
 def BlockAccess(request,pk):
     member = MemberData.objects.get(id = pk)
     access = AccessToGate.objects.get(Member = member)
@@ -444,10 +461,12 @@ def BlockAccess(request,pk):
     messages.success(request,"Access Status Changed....")
     return redirect(MembersSingleView,pk)
 
+@login_required(login_url='SignIn')
 def AllMembers(request):
     members = MemberData.objects.all()[::-1]
     return render(request, "allmembers.html",{"member":members})
 
+@login_required(login_url='SignIn')
 def AllPayments(request):
     payments = Payment.objects.all()[::-1]
     return render(request,"allpayments.html",{"payments":payments})
@@ -455,6 +474,7 @@ def AllPayments(request):
 
 # Reports generation
 
+@login_required(login_url='SignIn')
 def FullMemberReport(request):
     
     date = timezone.now().month
@@ -472,6 +492,7 @@ def FullMemberReport(request):
     return response
 
 
+@login_required(login_url='SignIn')
 def MonthMemberReport(request):
     
     date = timezone.now().month
@@ -488,6 +509,7 @@ def MonthMemberReport(request):
 
     return response
 
+@login_required(login_url='SignIn')
 def DateWiseMemberReport(request):
     date = timezone.now().month
     date_year = timezone.now().year
@@ -508,6 +530,7 @@ def DateWiseMemberReport(request):
     return response
 
 
+@login_required(login_url='SignIn')
 def DateWisePaymentReport(request):
     date = timezone.now().month
     date_year = timezone.now().year
@@ -549,6 +572,7 @@ def PaymentReport(request):
         return HttpResponse("No Valid Fiels")
     
 
+@login_required(login_url='SignIn')
 def PaymentReportMonth(request):
     date = timezone.now().month
     date_year = timezone.now().year
@@ -569,6 +593,7 @@ def PaymentReportMonth(request):
         return HttpResponse("No Valid Fiels")
 
 
+@login_required(login_url='SignIn')
 def PDFprintFullMemberReport(request):
     date = timezone.now().month
     date_year = timezone.now().year
@@ -590,6 +615,7 @@ def PDFprintFullMemberReport(request):
     return response
 
 
+@login_required(login_url='SignIn')
 def PDFprintFullPaymentReport(request):
     date = timezone.now().month
     date_year = timezone.now().year
