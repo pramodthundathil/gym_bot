@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+{% load static %}
 <html lang="en">
 
 <head>
@@ -58,6 +59,17 @@
         .card-body td {
             text-align: right;
         }
+        .headder{
+            display: flex;
+        }
+        table, th, td{
+            border: .5px solid gray;
+            border-collapse: collapse;
+        }
+        td{
+            text-align: left;
+            font-weight: bold !important;
+        }
        
     </style>
 </head>
@@ -69,30 +81,24 @@
         </div>
         <div class="receipt item">
             <div class="card-head">
+                <div class="headder">
+                    <div class="item">
+                <img src="{{logo.logo.path}}" style="width:150px;display:block;margin:auto;" alt="">
 
-                <img src="{{logo.logo.url}}" width="50px;display:block;margin:auto;" alt="">
-                <h3 style="color: blue;">EMMY WOMAN BODY FITNESS</h3>
-                <p>VILLA-78 SULTHANBIN WIZAISH, AL DHAHARI St. AL MUWAIJI-OUD BIN SAG-HAN, BESIDE AL MA'MOUN MEDICAL CENTER <br>
-                <P>UNITED ARAB EMIRATES</P>
-                Phone:03 7367119,</td>
-                    </tr>
-                    <tr>
-                        <th>MOB:</th>
-                        <td>+971-505084384,</td>
-                    </tr>
-                    
-                    <tr>
-                        <th>E-mail:</th>
-                        <td>emmybodyfitness@gmail.com,</td>
-                    </tr>
-                    <tr>
-                        <th>Web:</th>
-                        <td>www.bodyforcealain.com</td>
-                    </tr>
-                </table>
-                <h5 style="text-align: center;">VAT #000000</h5>
-                <h6>VAT RECEIPT # {{payid}}</h6>
-                <p>Date: {{payment_date}}</p>
+                    </div>
+                    <div class="item">
+                        <span style="color: blue;font-size: xx-large;">EMMY WOMAN BODY FITNESS</span>
+                    </div>
+                </div>
+                <span style="color: gray;">
+                VILLA-78 SULTHANBIN WIZAISH, AL DHAHARI St. AL MUWAIJI-OUD BIN SAG-HAN, BESIDE AL MA'MOUN MEDICAL CENTER <br>
+                UNITED ARAB EMIRATES
+                Phone:03 7367119, MOB:+971-505084384,E-mail:emmybodyfitness@gmail.com, Web:www.bodyforcealain.com
+<hr></span>
+            
+                <span style="text-align: center;font-size: large;font-weight: 600;"> VAT #000000 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                <h6 style="display: inline-block;"> VAT RECEIPT # {{payid}}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</h6>
+                <span style="text-align: right;font-size: medium;font-weight: 600;" > Date: {{payment_date}}&nbsp;&nbsp;&nbsp;&nbsp;</span>
             </div>
 
             <h6 class="center-h6" style="text-align: center;"><span>{{payid}} #</span> <span>{{member}}</span></h6>
@@ -100,7 +106,7 @@
             <div class="card-body">
                 <h4 style="color: blue;">Package:</h4>
                 <p>{{period}}</p>
-                <p>{{payid}}# month from {{payment_date}} to {{sub_end}} </p>
+                <p>{{payid}}# <br> from {{payment_date}} to {{sub_end}} </p>
                 <h4>From: <span style="color: black;font-weight:200 ;">{{payment_date}}</span></h4>
                 <h4>To: <span style="color: black;font-weight:200 ;">{{sub_end}}</span></h4>
                 <table>
@@ -108,27 +114,31 @@
                         <th>
                             <h4>Amount:</h4>
                         </th>
-                        <th>
+                        <td>
                             <span style="color: black;font-weight:200 ;">AED {{amount}}</span>
-                        </th>
+                        </td>
                     </tr>
                     <tr>
                         <th>
-                            <h4>Vat%:</h4>
+                            <h4>Vat %:</h4>
                         </th>
-                        <th>
+                        <td>
                             <span style="color: black;font-weight:200 ;">AED 0.00</span>
-                        </th>
+                        </td>
                     </tr>
                     <tr>
                         <th>
                             <h4>Total: </h4>
                         </th>
-                        <th>
+                        <td>
                             <span style="color: black;font-weight:200 ;">AED {{amount}}</span>
-                        </th>
+                        </td>
                     </tr>
-                </table>
+                </table><br><br><br>
+
+                Thanks, <br><br><br>
+
+                EMMY FITNESS
 
             </div>
 

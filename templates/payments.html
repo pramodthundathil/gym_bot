@@ -2,6 +2,33 @@
 {% load static %}
 
 {% block content %}
+<style>
+  .list-card {
+  position: relative;
+  /* display: inline-block; */
+  /* border-bottom: 1px dotted black; */
+}
+
+.list-card .tooltiptext {
+  visibility: hidden;
+  width: auto;
+  background-color: black;
+  color: #fff;
+  text-align: center;
+  border-radius: 6px;
+  padding: 10px 0;
+  
+  /* Position the tooltip */
+  position: absolute;
+  z-index: 1;
+  top: -5px;
+  left: 70%;
+}
+
+.list-card:hover .tooltiptext {
+  visibility: visible;
+}
+</style>
 
 <div class="main-panel">
   <div class="content-wrapper pb-0">
@@ -66,9 +93,28 @@
                     </td>
                     <td>
                       <a href="{%url 'ReceiptGenerate' i.id %}" target="_blank" class="btn btn-outline-warning">Get Receipt</a>
-                      <a href="{%url 'DeletePayment' i.id %}" class="btn btn-outline-danger btn-sm">delete</a>
+                      <a data-bs-toggle="modal" data-bs-target="#staticBackdropsubperitype" class="btn btn-outline-danger btn-sm">delete</a>
                     </td>
                   </tr>
+                      <!-- Modal Sub Period delete -->
+                      <div class="modal fade" id="staticBackdropsubperitype" data-bs-backdrop="static"
+                      data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel"
+                      aria-hidden="true">
+                      <div class="modal-dialog">
+                          <div class="modal-content">
+
+                              <div class="modal-body">
+                                  Do you Want To delete payment ?
+                              </div>
+                              <div class="modal-footer">
+                                  <button type="button" class="btn btn-secondary"
+                                      data-bs-dismiss="modal">No</button>
+                                  <a href="{%url 'DeletePayment' i.id %}" type="button"
+                                      class="btn btn-danger">Yes</a>
+                              </div>
+                          </div>
+                      </div>
+                  </div>
                   {% endfor %}
 
                 </tbody>
@@ -87,6 +133,8 @@
             {% for i in pay  %}
 
             <div class="list-card">
+              <span class="tooltiptext">Latest Payment Information</span>
+
               <div class="row align-items-center">
                 <div class="col-7 col-sm-8">
                   <div class="row align-items-center">
@@ -102,12 +150,12 @@
                 <div class="col-5 col-sm-4">
                   <div class="d-flex pt-1 align-items-center">
                     <div class="reload-outer bg-info">
-                      <i class="mdi mdi-reload"></i>
+                      <!-- <i class="mdi mdi-reload"></i> -->
                     </div>
                     <div class="dropdown dropleft pl-1 pt-3">
                       <div id="dropdownMenuButton2" data-toggle="dropdown" role="button" aria-haspopup="true"
                         aria-expanded="false">
-                        <p><i class="mdi mdi-dots-vertical"></i></p>
+                        <!-- <p><i class="mdi mdi-dots-vertical"></i></p> -->
                       </div>
                       <div class="dropdown-menu" aria-labelledby="dropdownMenuButton2">
                       </div>
@@ -151,7 +199,7 @@
         <li class="nav-item" role="presentation">
           <button class="nav-link" id="contact-tab" data-bs-toggle="tab" data-bs-target="#contact" type="button"
             role="tab" aria-controls="contact" aria-selected="false">Upcomming</button>
-        </li>
+        </li> 
       </ul>
       <div class="tab-content" id="myTabContent">
         <div class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-tab">
@@ -280,7 +328,7 @@
             </div>
           </div>
         </div>
-        <div class="tab-pane fade" id="contact" role="tabpanel" aria-labelledby="contact-tab">
+        <div class="tab-pane fade mt-0" id="contact" role="tabpanel" aria-labelledby="contact-tab">
           <div class="row">
             <div class="col-xl-12 col-sm-6 grid-margin stretch-card">
               <div class="card" style="height: 500px;">
@@ -406,10 +454,8 @@
     </div>
     <footer class="footer">
       <div class="d-sm-flex justify-content-center justify-content-sm-between">
-        <span class="text-muted d-block text-center text-sm-left d-sm-inline-block">Copyright © byteboot techno
-          solutions pvt ltd</span>
-        <span class="float-none float-sm-right d-block mt-1 mt-sm-0 text-center"> Developed By <a
-            href="https://www.betainfotech.com/" target="_blank">Byteboot techno solutions</a> Pvt Ltd</span>
+        <span class="text-muted d-block text-center text-sm-left d-sm-inline-block">Copyright © red defend computers</span>
+        <span class="float-none float-sm-right d-block mt-1 mt-sm-0 text-center"> Developed By <a href="https://www.betainfotech.com/" target="_blank">red defend computers</a></span>
       </div>
     </footer>
   </div>

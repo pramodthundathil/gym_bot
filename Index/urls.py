@@ -15,6 +15,10 @@ urlpatterns = [
     path("ChangePassword",views.ChangePassword,name="ChangePassword"),
     path("Search",views.Search,name="Search"),
     path("DeviceConfig/<int:pk>",views.DeviceConfig,name="DeviceConfig"),  
+    path("ViewAllActivities",views.ViewAllActivities,name="ViewAllActivities"),
+    path("EditBatch/<int:pk>",views.EditBatch,name="EditBatch"),  
+    path("EditsubscriptionPeriod/<int:pk>",views.EditsubscriptionPeriod,name="EditsubscriptionPeriod"),  
+    path("EditSub/<int:pk>",views.EditSub,name="EditSub"),  
 
 
 

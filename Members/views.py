@@ -43,7 +43,7 @@ def ScheduledTask():
     }
     json_payload = json.dumps(body)
     try:
-        reponse = requests.post(url,headers = header1,data = json_payload)
+        response = requests.post(url,headers = header1,data = json_payload)
         if response.status_code == 200:
             print('Request successful!')
             token_dict = json.load(response)
@@ -84,7 +84,7 @@ def ScheduledTask():
             }
             json_payload = json.dumps(data)
             try:
-                respose = request.patch(url, hedders = headers, data = json_payload)
+                respose = requests.patch(url, hedders = headers, data = json_payload)
                 if respose.status_code == 200:
                     print("Succeed...")
                 else:
@@ -100,7 +100,7 @@ def ScheduledTask():
             }
             json_payload = json.dumps(data)
             try:
-                respose = request.patch(url, hedders = headers, data = json_payload)
+                respose = requests.patch(url, hedders = headers, data = json_payload)
                 if respose.status_code == 200:
                     print("Succeed...")
                 else:
@@ -156,7 +156,9 @@ def Member(request):
         "form":form,
         "sub_form":sub_form,
         "Trainee":Trainee,
-        "subscribers":subscribers
+        "subscribers":subscribers,
+        "notificationcount":notification_payments.count()
+
 
         }
     return render(request,"members.html",context)
@@ -521,7 +523,7 @@ def DateWiseMemberReport(request):
         sdate = request.POST["sdate"]
         edate = request.POST["enddate"]
         
-    
+
     member = MemberData.objects.filter(Date_Added__gte = sdate,Date_Added__lte = edate ).order_by("-Date_Added")
     
     writer = csv.writer(response)
@@ -637,6 +639,53 @@ def PDFprintFullPaymentReport(request):
     if pisa_status.err:
         return HttpResponse("we are some erros <pre>" + html + '</pre>')
     return response
+
+@login_required(login_url='SignIn')
+def PDFmonthMember(request):
+    date = timezone.now().month
+    date_year = timezone.now().year
+    member = MemberData.objects.filter(Date_Added__month = date)
+    template_path = "reportPDFmonthMember.html"
+
+    context = {
+       "member":member,
+       "date":date
+    }
+    response = HttpResponse(content_type = "application/pdf")
+    response['Content-Disposition'] = "filename=Memberreportmonth{}-{}.pdf".format(date,date_year)
+    template = get_template(template_path)
+    html = template.render(context)
+
+    # create PDF
+    pisa_status = pisa.CreatePDF(html, dest = response)
+    if pisa_status.err:
+        return HttpResponse("we are some erros <pre>" + html + '</pre>')
+    return response
+
+
+@login_required(login_url='SignIn')
+def PDFmonthpayment(request):
+    date = timezone.now().month
+    date_year = timezone.now().year
+    payment = Payment.objects.filter(Payment_Date__month = date)
+    template_path = "reportPDFmonthpayment.html"
+
+    context = {
+       "payment":payment,
+       "date":date
+    }
+    response = HttpResponse(content_type = "application/pdf")
+    response['Content-Disposition'] = "filename=Paymentreportmonth{}-{}.pdf".format(date,date_year)
+    template = get_template(template_path)
+    html = template.render(context)
+
+    # create PDF
+    pisa_status = pisa.CreatePDF(html, dest = response)
+    if pisa_status.err:
+        return HttpResponse("we are some erros <pre>" + html + '</pre>')
+    return response
+
+    
 
 
 

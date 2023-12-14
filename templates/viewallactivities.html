@@ -15,7 +15,7 @@
         </div>
         {% endfor %}
         <div class="page-header flex-wrap">
-            <h3 class="mb-0"> All Payments <span class="pl-0 h6 pl-sm-2 text-muted d-inline-block"></span>
+            <h3 class="mb-0"> Payments Notifications <span class="pl-0 h6 pl-sm-2 text-muted d-inline-block"></span>
             </h3>
         </div>
 
@@ -23,7 +23,7 @@
             <div class="col-xl-12 col-sm-6 grid-margin stretch-card">
                 <div class="card">
                   <div class="card-body px-0 overflow-auto">
-                    <h4 class="card-title pl-4">All Payments</h4>
+                    <h4 class="card-title pl-4">Payment Notifications</h4>
                     <div class="table-responsive">
                       <table class="table">
                         <thead class="bg-light">
@@ -36,7 +36,7 @@
                           </tr>
                         </thead>
                         <tbody>
-                          {% for i in payments %}
+                          {% for i in notification_payments %}
                             
                           <tr>
                             <td>
@@ -59,29 +59,9 @@
                             </td>
                             <td>
                               <a href="{%url 'ReceiptGenerate' i.id %}" target="_blank" class="btn btn-outline-warning">Get Receipt</a>
-
-                              <a data-bs-toggle="modal" data-bs-target="#staticBackdropsubperitype" class="btn btn-outline-danger btn-sm">delete</a>
+                              <a href="{%url 'DeletePayment' i.id %}" class="btn btn-outline-danger btn-sm">delete</a>
                             </td>
                           </tr>
-                              <!-- Modal Sub Period delete -->
-                              <div class="modal fade" id="staticBackdropsubperitype" data-bs-backdrop="static"
-                              data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel"
-                              aria-hidden="true">
-                              <div class="modal-dialog">
-                                  <div class="modal-content">
-        
-                                      <div class="modal-body">
-                                          Do you Want To delete payment ?
-                                      </div>
-                                      <div class="modal-footer">
-                                          <button type="button" class="btn btn-secondary"
-                                              data-bs-dismiss="modal">No</button>
-                                          <a href="{%url 'DeletePayment' i.id %}" type="button"
-                                              class="btn btn-danger">Yes</a>
-                                      </div>
-                                  </div>
-                              </div>
-                          </div>
                           {% endfor %}
 
                         </tbody>

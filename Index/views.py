@@ -14,7 +14,7 @@ from django.contrib.auth.decorators import login_required
 
 this_month = timezone.now().month
 end_date = timezone.now()
-start_date = end_date + timedelta(days=-5)
+start_date = end_date + timedelta(days=-7)
 
 
 @login_required(login_url='SignIn')
@@ -221,4 +221,54 @@ def Search(request):
         }
         return render(request, "search.html",context)
     return render(request, "search.html")
+
+def ViewAllActivities(request):
+    notification_payments = Payment.objects.filter(Payment_Date__gte = start_date,Payment_Date__lte = end_date )
+    context = {
+        "notification_payments":notification_payments,
+        "notificationcount":notification_payments.count(),
+
+    }
+    return render(request,'viewallactivities.html',context)
     
+def EditBatch(request,pk):
+    if request.method == "POST":
+        batch = request.POST["batch"]
+        time = request.POST["time"]
+
+        bat = Batch_DB.objects.get(id = pk)
+        bat.Batch_Name = batch
+        bat.Batch_Time = time
+        bat.save()
+        messages.success(request, "Batch updated")
+        return redirect("Setting_Module")
+
+
+    return render(request,"editbatch.html")
+
+def EditsubscriptionPeriod(request,pk):
+    if request.method == "POST":
+        Period = request.POST["peri"]
+        Category = request.POST["ten"]
+
+        bat = Subscription_Period.objects.get(id = pk)
+        bat.Period = Period
+        bat.Category = Category
+        bat.save()
+        messages.success(request, "Subscription Period Updated")
+        return redirect("Setting_Module")
+
+    return render(request,"editsubperiod.html")
+
+def EditSub(request,pk):
+    if request.method == "POST":
+        sub = request.POST["sub"]
+       
+        bat = TypeSubsription.objects.get(id = pk)
+        bat.Type = sub
+        
+        bat.save()
+        messages.success(request, "Subscription  Updated")
+        return redirect("Setting_Module")
+     
+    return render(request,"editsubscription.html")

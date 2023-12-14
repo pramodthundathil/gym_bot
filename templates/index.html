@@ -148,7 +148,10 @@
 
                   
                   <div class="dropdown-divider"></div>
+                  <a href="{%url 'ViewAllActivities' %}">
                   <p class="p-3 mb-0">View all activities</p>
+                  </a>
+                  
                 </div>
               </li>
               
@@ -324,60 +327,56 @@
                   <div class="card-body">
                     <div class="row pt-4">
                       <div class="col-sm-6">
-                        <h1 class="text-white">10:16PM</h1>
-                        <h5 class="text-white">Monday 25 October, 2016</h5>
+                        <h1 class="text-white" id="time">10:16PM</h1>
+                        <h5 class="text-white" id="date">Monday 25 October, 2016</h5>
                         <h5 class="text-white pt-2 m-0">Precipitation:50%</h5>
-                        <h5 class="text-white m-0">Humidity:23%</h5>
-                        <h5 class="text-white m-0">Wind:13 km/h</h5>
+                        <h5 class="text-white m-0">Humidity: <span id="hum"></span> </h5>
+                        <h5 class="text-white m-0">Wind: <span id="wind"></span> km/h</h5>
                       </div>
                       <div class="col-sm-6 text-sm-right pt-3 pt-sm-0">
-                        <h3 class="text-white">Clear Sky</h3>
-                        <p class="text-white m-0">London, UK</p>
-                        <h3 class="text-white m-0">21°C</h3>
+                        <h3 class="text-white" id="sky_status">Clear Sky</h3>
+                        <p class="text-white m-0" id="city"></p>
+                        <h3 class="text-white m-0" id="temp">21<span>°C</span></h3>
                       </div>
                     </div>
                     <div class="row mt-5">
                       <div class="col-sm-12">
                         <ul class="d-flex pl-0 overflow-auto">
-                          <li class="weakly-weather-item text-white font-weight-medium text-center active">
-                            <p class="mb-0">TODAY</p>
-                            <i class="mdi mdi-weather-cloudy"></i>
-                            <p class="mb-0">21<span class="symbol">°c</span></p>
-                          </li>
+                          
                           <li class="weakly-weather-item text-white font-weight-medium text-center">
                             <p class="mb-0">MON</p>
                             <i class="mdi mdi-weather-hail"></i>
-                            <p class="mb-0">21<span class="symbol">°c</span></p>
+                            <p class="mb-0" id="tempW1">21<span class="symbol">°c</span></p>
                           </li>
                           <li class="weakly-weather-item text-white font-weight-medium text-center">
                             <p class="mb-0">TUE</p>
                             <i class="mdi mdi-weather-cloudy"></i>
-                            <p class="mb-0">21<span class="symbol">°c</span></p>
+                            <p class="mb-0"id="2">21<span class="symbol">°c</span></p>
                           </li>
                           <li class="weakly-weather-item text-white font-weight-medium text-center">
                             <p class="mb-0">WED</p>
                             <i class="mdi mdi-weather-fog"></i>
-                            <p class="mb-0">21<span class="symbol">°c</span></p>
+                            <p class="mb-0" id="3">21<span class="symbol">°c</span></p>
                           </li>
                           <li class="weakly-weather-item text-white font-weight-medium text-center">
                             <p class="mb-0">THU</p>
                             <i class="mdi mdi-weather-hail"></i>
-                            <p class="mb-0">21<span class="symbol">°c</span></p>
+                            <p class="mb-0" id="4">21<span class="symbol">°c</span></p>
                           </li>
                           <li class="weakly-weather-item text-white font-weight-medium text-center">
                             <p class="mb-0">FRI</p>
                             <i class="mdi mdi-weather-cloudy"></i>
-                            <p class="mb-0">21<span class="symbol">°c</span></p>
+                            <p class="mb-0" id="5">21<span class="symbol">°c</span></p>
                           </li>
                           <li class="weakly-weather-item text-white font-weight-medium text-center">
                             <p class="mb-0">SAT</p>
                             <i class="mdi mdi-weather-hail"></i>
-                            <p class="mb-0">21<span class="symbol">°c</span></p>
+                            <p class="mb-0" id="6">21<span class="symbol">°c</span></p>
                           </li>
                           <li class="weakly-weather-item text-white font-weight-medium text-center">
                             <p class="mb-0">SUN</p>
                             <i class="mdi mdi-weather-cloudy"></i>
-                            <p class="mb-0">21<span class="symbol">°c</span></p>
+                            <p class="mb-0" id="7">21<span class="symbol">°c</span></p>
                           </li>
                         </ul>
                       </div>
@@ -400,8 +399,8 @@
 
           <footer class="footer">
             <div class="d-sm-flex justify-content-center justify-content-sm-between">
-              <span class="text-muted d-block text-center text-sm-left d-sm-inline-block">Copyright © byteboot techno solutions pvt ltd</span>
-              <span class="float-none float-sm-right d-block mt-1 mt-sm-0 text-center"> Developed By <a href="https://www.betainfotech.com/" target="_blank">Byteboot techno solutions</a> Pvt Ltd</span>
+              <span class="text-muted d-block text-center text-sm-left d-sm-inline-block">Copyright © red defend computers</span>
+              <span class="float-none float-sm-right d-block mt-1 mt-sm-0 text-center"> Developed By <a href="https://www.betainfotech.com/" target="_blank">red defend computers</a></span>
             </div>
           </footer>
         </div>
@@ -412,6 +411,70 @@
       </div>
       <!-- page-body-wrapper ends -->
     </div>
+    <script>
+          const apiUrl = 'https://api.openweathermap.org/data/2.5/weather?q=dubai&units=metric&appid=076465d2e663be277c6d13a3991ca3b6';
+          const currentDate = new Date();
+          const apiWeeKurl = "https://api.openweathermap.org/data/2.5/forecast?q=dubai&units=metric&appid=076465d2e663be277c6d13a3991ca3b6"
+// Get the current date and time components
+      const year = currentDate.getFullYear();
+      const month = currentDate.getMonth() + 1; // Months are zero-based, so add 1
+      const day = currentDate.getDate();
+      const hours = currentDate.getHours();
+      const minutes = currentDate.getMinutes();
+      const seconds = currentDate.getSeconds();
+      const formattedDate = `${year}-${month < 10 ? '0' + month : month}-${day < 10 ? '0' + day : day}`;
+      const formattedTime = `${hours < 10 ? '0' + hours : hours}:${minutes < 10 ? '0' + minutes : minutes}:${seconds < 10 ? '0' + seconds : seconds}`;
+            document.getElementById('time').innerHTML = formattedTime;
+            document.getElementById('date').innerHTML = formattedDate
+// Make a GET request to the API
+fetch(apiUrl)
+  .then(response => {
+    // Check if the request was successful (status code 200)
+    if (!response.ok) {
+      throw new Error(`HTTP error! Status: ${response.status}`);
+    }
+    // Parse the response as JSON
+    return response.json();
+  })
+  .then(data => {
+    // Store the result in a variable called 'data'
+    const weatherData = data;
+    console.log(weatherData.main.temp);
+    document.getElementById('city').innerHTML =weatherData.name
+    document.getElementById("sky_status").innerHTML= weatherData.weather[0].description
+    document.getElementById('temp').innerHTML = weatherData.main.temp
+    document.getElementById('hum').innerHTML = weatherData.main.humidity
+    document.getElementById('wind').innerHTML = weatherData.wind.speed
+    console.log(weatherData) 
+    // Now you can use 'weatherData' as needed in your code
+  })
+  .catch(error => {
+    console.error('Fetch error:', error);
+  });
+
+  fetch(apiWeeKurl).then((response)=>{
+    if (!response.ok) {
+      throw new Error(`HTTP error! Status: ${response.status}`);
+    } return response.json();
+  }).then(data=>{
+      console.log(data,"weekly")
+          let array = data.list;
+          let id = 0;
+        //  console.log(array[0].main.temp,"temp")
+      
+             console.log("hai",array[0].main.temp);
+      // Assuming you want to update the inner HTML of an element with the id `${i}`
+      // Replace `YOUR_ELEMENT_ID` with the actual id you want to target
+         document.getElementById("tempW1").innerHTML = array[0].main.temp;
+         document.getElementById("2").innerHTML = array[0].main.temp;
+         for(let i=2;i<7;i++){
+          document.getElementById(`${i}`).innerHTML = array[i].main.temp;
+         }
+  
+          
+    
+  })
+    </script>
     <!-- container-scroller -->
     <!-- plugins:js -->
     <script src="{%static 'assets/vendors/js/vendor.bundle.base.js' %}"></script>
