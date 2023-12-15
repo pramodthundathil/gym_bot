@@ -403,9 +403,14 @@ def ReceiptGenerate(request,pk):
     amount  = payment.Amount
     payid  = pk
     payment_date = payment.Payment_Date
-    sub_start = payment.Subscription_ID.Subscribed_Date
-    sub_end = payment.Subscription_ID.Subscription_End_Date
-    period = payment.Subscription_ID.Period_Of_Subscription
+    try:
+        sub_start = payment.Subscription_ID.Subscribed_Date
+        sub_end = payment.Subscription_ID.Subscription_End_Date
+        period = payment.Subscription_ID.Period_Of_Subscription
+    except:
+        sub_start = "Null"
+        sub_end = "Null"
+        period = "Null"
     template_path = "receipt.html"
 
     context = {
