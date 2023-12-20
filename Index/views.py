@@ -1,5 +1,6 @@
 from django.shortcuts import render,redirect
 from django.contrib import messages
+from django.contrib.auth.models import User, Group
 from django.http import HttpResponse
 from django.contrib.auth import authenticate,login,logout
 from Members.models import Subscription_Period, Subscription, Batch_DB, TypeSubsription,MemberData,Payment, AccessToGate
@@ -8,7 +9,7 @@ from datetime import datetime, timedelta
 from django.utils import timezone
 from .models import ConfigarationDB
 from Members.views import ScheduledTask
-from .decorator import unautenticated_user
+from .decorator import unautenticated_user, allowed_users
 from django.contrib.auth.decorators import login_required
 
 
@@ -272,3 +273,43 @@ def EditSub(request,pk):
         return redirect("Setting_Module")
      
     return render(request,"editsubscription.html")
+
+
+
+# add new staff 
+
+@allowed_users(allowed_roles=["admin",])
+@login_required(login_url='SignIn')
+def StaffDetails(request):
+    users = User.objects.filter(groups__name='staff')
+    if request.method == "POST":
+        fname = request.POST['fname']
+        uname = request.POST['uname']
+        password1 = request.POST['password1']
+        password2 = request.POST['password2']
+
+        if password1 != password2:
+            messages.error(request,"Password Do not matching....")
+            return redirect("StaffDetails")
+        elif User.objects.filter(username = uname).exists():
+            messages.error(request,"Username already exists please try different username..")
+            return redirect("StaffDetails")
+        else:
+            user = User.objects.create_user(first_name = fname, username = uname, password = password1)
+            user.save()
+            group = Group.objects.get(name='staff')
+            user.groups.add(group)
+            messages.success(request,"New Staff Created Please save password {}".format(password1))
+            return redirect("StaffDetails")
+    context = {
+        "users":users
+    } 
+        
+    return render(request,'usermanagement.html',context)
+
+@allowed_users(allowed_roles=["admin",])
+@login_required(login_url='SignIn')
+def DeleteStaffUser(request,pk):
+    User.objects.get(id = pk).delete()
+    messages.info(request,"User Deleted...")
+    return redirect("StaffDetails")

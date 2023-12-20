@@ -19,6 +19,9 @@ urlpatterns = [
     path("EditBatch/<int:pk>",views.EditBatch,name="EditBatch"),  
     path("EditsubscriptionPeriod/<int:pk>",views.EditsubscriptionPeriod,name="EditsubscriptionPeriod"),  
     path("EditSub/<int:pk>",views.EditSub,name="EditSub"),  
+    path("StaffDetails",views.StaffDetails,name="StaffDetails"),
+    path("DeleteStaffUser/<int:pk>",views.DeleteStaffUser,name="DeleteStaffUser"),  
+
 
 
 

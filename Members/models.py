@@ -33,11 +33,14 @@ class MemberData(models.Model):
     Date_Of_Birth = models.DateField(auto_now_add=False)
     Gender = models.CharField(max_length=255,choices=(("Male","Male"),("Female","Female"),("Other","Other")))
     Mobile_Number = models.IntegerField()
+    Discount = models.FloatField(null=True, blank= True)
+    Special_Discount = models.BooleanField(default = False)
     Email = models.EmailField()
     Address = models.TextField(max_length=200)
     Medical_History = models.TextField(max_length=2000,null=True,blank=True)
     Registration_Date = models.DateField(auto_now_add=False)
     Photo = models.FileField(upload_to='member_photo')
+    Id_Upload = models.FileField(upload_to="member_id", null=True, blank=True)
     Date_Added = models.DateField(auto_now_add=True)
     Active_status = models.BooleanField(default=True)
     Access_status = models.BooleanField(default=False)
@@ -65,6 +68,7 @@ class Payment(models.Model):
     Member = models.ForeignKey(MemberData, on_delete=models.CASCADE)
     Subscription_ID = models.ForeignKey(Subscription, on_delete=models.SET_NULL,null=True,blank=True)
     Amount = models.IntegerField(null=True, blank=True)
+    Mode_of_Payment = models.CharField(max_length = 255, null=True, blank= True, choices = (("Cash","Cash"),("Bank Transfer","Bank Transfer"),("Card","Card")) )
     Payment_Date = models.DateField(auto_now_add=False,null=True,blank=True)
     Payment_Status = models.BooleanField(default=False)
     Access_status = models.BooleanField(default=False)
@@ -75,6 +79,10 @@ class AccessToGate(models.Model):
     Validity_Date = models.DateField(auto_now_add=False)
     Status = models.BooleanField(default=False)
     Payment_status = models.BooleanField(default=False)
+
+class Discounts(models.Model):
+    Discount_Percentage = models.FloatField()
+    Till_Date = models.DateField()
 
 
 

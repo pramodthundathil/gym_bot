@@ -32,6 +32,16 @@ urlpatterns = [
     path("PDFmonthpayment",views.PDFmonthpayment,name="PDFmonthpayment"),
 
     
+    path("EditPayment/<int:pk>",views.EditPayment,name="EditPayment"),
+    path("Discount",views.Discount,name="Discount"),
+    path("DiscountAllAdd",views.DiscountAllAdd,name="DiscountAllAdd"),
+    path("DiscountSingleAdd",views.DiscountSingleAdd,name="DiscountSingleAdd"),
+    path("DeleteAllDiscounts/<int:pk>",views.DeleteAllDiscounts,name="DeleteAllDiscounts"),
+    path("DeletespecialDiscount/<int:pk>",views.DeletespecialDiscount,name="DeletespecialDiscount"),
+    path("AddNewPayment",views.AddNewPayment,name="AddNewPayment"),
+    path("PostNewPayment/<int:pk>",views.PostNewPayment,name="PostNewPayment"),
+    path("AddNewPaymentFromMember/<int:pk>",views.AddNewPaymentFromMember,name="AddNewPaymentFromMember"),
+
 
 
 

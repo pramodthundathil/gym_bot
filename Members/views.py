@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
 from .forms import MemberAddForm, SubscriptionAddForm, PaymentForm
-from .models import MemberData, Subscription, Payment, AccessToGate
+from .models import MemberData, Subscription, Payment, AccessToGate, Discounts
 from django.contrib import messages
 from datetime import datetime, timedelta
 from django.utils import timezone
@@ -14,6 +14,7 @@ import requests
 import json
 from django.contrib.auth.decorators import login_required
 from Index.models import Logo
+from Index.decorator import allowed_users
 
 
 
@@ -169,6 +170,7 @@ def MembersSingleView(request,pk):
     subscription = Subscription.objects.get(Member = member)
     access = AccessToGate.objects.get(Member = member)
     sub_form = SubscriptionAddForm()
+    payments = Payment.objects.filter(Member = member)
     ScheduledTask()
 
     context = {
@@ -176,7 +178,8 @@ def MembersSingleView(request,pk):
         "subscription":subscription,
         'sub_form':sub_form,
         "access":access,
-        "notification_payments":notification_payments
+        "notification_payments":notification_payments,
+        "payments":payments
 
     }
     return render(request,"memberssingleview.html",context)
@@ -292,7 +295,7 @@ def Payments(request):
     sub_today = Subscription.objects.filter(Subscription_End_Date = today,Payment_Status = False)[:8][::-1]
     sub_past = Subscription.objects.filter(Subscription_End_Date__lte = today,Payment_Status = False)[:8][::-1]
     sub_Upcoming = Subscription.objects.filter(Subscription_End_Date__gte = today,Subscription_End_Date__lte = end_date, Payment_Status = False)[:8][::-1]
-
+    member = MemberData.objects.all()
     
     if request.method == "POST":
         form = PaymentForm(request.POST)
@@ -345,9 +348,98 @@ def Payments(request):
         "notification_payments":notification_payments,
         "sub_today":sub_today,
         "sub_past":sub_past,
-        "sub_Upcoming":sub_Upcoming
+        "sub_Upcoming":sub_Upcoming,
+        "member":member,
     }
     return render(request, "payments.html",context)
+
+@login_required(login_url='SignIn')
+def AddNewPayment(request):
+    if request.method == "POST":
+        mid = request.POST["member"]
+        member = MemberData.objects.get(id = mid)
+        Sub = Subscription.objects.get(Member = member)
+
+        context = {
+            "member":member,
+            "sub":Sub,
+            "discounted":Sub.Amount - (Sub.Amount*member.Discount)/100
+        }
+        return render(request,"paymentscreen.html",context)
+    
+@login_required(login_url='SignIn')
+def AddNewPaymentFromMember(request,pk):
+
+    member = MemberData.objects.get(id = pk)
+    Sub = Subscription.objects.get(Member = member)
+
+    context = {
+        "member":member,
+        "sub":Sub,
+        "discounted":Sub.Amount - (Sub.Amount*member.Discount)/100
+    }
+    return render(request,"paymentscreen.html",context)
+    
+
+@login_required(login_url='SignIn')
+def PostNewPayment(request,pk):
+
+    if request.method == "POST":
+
+        mode = request.POST["mode"]
+        date = request.POST["date"]
+        member = MemberData.objects.get(id = pk)
+        access = AccessToGate.objects.get(Member = member)
+        sub = Subscription.objects.get(Member = member)
+        payment = Payment.objects.create(Member = member, Subscription_ID = sub,Mode_of_Payment = mode,Payment_Date = date, Amount = sub.Amount - (sub.Amount*member.Discount)/100 )
+        payment.save()
+
+        payment.Payment_Status = True 
+        payment.Access_status = True
+        payment.save()
+        sub.Payment_Status = True
+        sub.save()
+        user = payment.Member
+        user.Access_status = True
+        user.save()
+
+        try:
+            sub_date = request.POST["sub_extendate"]
+            access.Validity_Date = sub_date
+            access.save()
+           
+            sub.Subscription_End_Date = sub_date
+            sub.save()
+
+        except:
+            sub_date = sub.Subscription_End_Date
+            access.Validity_Date = sub_date
+            access.save()
+           
+        sub.Subscription_End_Date = sub_date
+        sub.save()
+
+        try:
+            amount = request.POST["Custome_amount"]
+            payment.Amount = amount
+            payment.save()
+            
+        except:
+            a = 100
+    
+            
+        if AccessToGate.objects.filter(Validity_Date__gte = today, Member = member ).exists():
+            access.Status = True 
+            access.Payment_status = True
+        else:
+            access.Status = False 
+        access.save()
+        ScheduledTask()
+
+        messages.success(request,"Payment Updated for member {}".format(user))
+        return redirect("Payments")
+
+    return redirect("Payments")
 
 @login_required(login_url='SignIn')
 def AddPaymentFromMemberTab(request,pk):
@@ -374,6 +466,8 @@ def AddPaymentFromMemberTab(request,pk):
             sub_date = sub.Subscription_End_Date
             access.Validity_Date = sub_date
             access.save()
+
+        
             
         sub.Subscription_End_Date = sub_date
         sub.save()
@@ -692,8 +786,92 @@ def PDFmonthpayment(request):
 
     
 
+# Payments and now updates after deploy
 
 
+@allowed_users(allowed_roles=["admin",])
+@login_required(login_url='SignIn')
+def EditPayment(request,pk):
+    mypay = Payment.objects.get(id = pk)
+    if request.method == "POST":
+        mode = request.POST["Mode"]
+        Amount = request.POST["amount"]
+        date = request.POST["date"]
+
+        mypay.Amount = Amount
+        mypay.Mode_of_Payment = mode 
+        mypay.Payment_Date = date
+        mypay.save()
+        messages.success(request,"Payment Data Updated")
+        return redirect("Payments")
+
+    context = {
+        "mypay":mypay
+    }
+    return render(request,"editpayment.html",context)
+
+
+# discounts to members 
+@allowed_users(allowed_roles=["admin",])
+@login_required(login_url='SignIn')
+def Discount(request):
+    member = MemberData.objects.all()
+    discount = Discounts.objects.all()
+    context = {
+        "member":member,
+        "discount":discount
+    }
+    return render(request,"discounts.html",context)
+
+
+@allowed_users(allowed_roles=["admin",])
+@login_required(login_url='SignIn')
+def DiscountAllAdd(request):
+    if request.method == "POST":
+        dateend = request.POST["dateend"]
+        disper  = request.POST["disper"]
+        member  = MemberData.objects.filter(Special_Discount = False)
+        dis = Discounts.objects.create(Discount_Percentage = disper,Till_Date = dateend)
+        dis.save()
+        member.update(Discount = disper)
+        # member.save()
+        messages.success(request,"Discount Applied for all members")
+        return redirect("Discount")
+
+    return redirect("Discounts")
+
+@allowed_users(allowed_roles=["admin",])
+@login_required(login_url='SignIn')
+def DiscountSingleAdd(request):
+    if request.method == "POST":
+        member = MemberData.objects.get(id = request.POST["member"])
+        dis = request.POST["disper"]
+        member.Discount = dis
+        member.Special_Discount = True
+        member.save()
+        messages.success(request,"Special Discount Applied Members")
+        return redirect("Discount")
+
+
+@allowed_users(allowed_roles=["admin",])
+@login_required(login_url='SignIn')
+def DeleteAllDiscounts(request,pk):
+    Discounts.objects.get(id = pk).delete()
+    member = MemberData.objects.filter(Special_Discount = False)
+    member.update(Discount = 0)
+    # member.save()
+    messages.success(request,"Discount Deleted")
+    return redirect("Discount")
+
+@allowed_users(allowed_roles=["admin",])
+@login_required(login_url='SignIn')
+def DeletespecialDiscount(request,pk):
+    member = MemberData.objects.get(id = pk)
+    member.Discount = 0
+    member.Special_Discount = False
+    member.save()
+    messages.success(request,"Discount Deleted")
+    return redirect("Discount")
 
 
 

@@ -16,10 +16,11 @@ class MemberAddForm(ModelForm):
             "Mobile_Number",
             "Email",
             "Registration_Date",
+            "Access_Token_Id",
             "Photo",
+            "Id_Upload",
             "Address",
             "Medical_History",
-            "Access_Token_Id"
         ]
 
         widgets = {
@@ -34,6 +35,7 @@ class MemberAddForm(ModelForm):
             # "Address":TextInput(attrs={"class":"form-control",'style': 'height: 3em !importent;'}),
             # "Medical_History":TextInput(attrs={"class":"form-control"}),
             "Photo":FileInput(attrs={"class":"form-control",'accept': 'image/*', 'capture':'camera'}),
+            "Id_Upload":FileInput(attrs={"class":"form-control",'accept': 'image/*', 'capture':'camera'}),
             "Access_Token_Id":TextInput(attrs={"class":"form-control"})
 
         }
@@ -46,7 +48,7 @@ class SubscriptionAddForm(ModelForm):
             "Period_Of_Subscription",
             "Amount",
             "Subscribed_Date",
-            "Subscription_End_Date",
+            # "Subscription_End_Date",
             "Batch",
         ]
 
@@ -55,7 +57,7 @@ class SubscriptionAddForm(ModelForm):
             "Period_Of_Subscription":Select(attrs={"class":"form-control"}),
             "Amount":TextInput(attrs={"class":"form-control","type":"number"}),
             "Subscribed_Date":TextInput(attrs={"class":"form-control","type":"date"}),
-            "Subscription_End_Date":TextInput(attrs={"class":"form-control","type":"date","min":date}),
+            # "Subscription_End_Date":TextInput(attrs={"class":"form-control","type":"date","min":date}),
             "Batch":Select(attrs={"class":"form-control"}),
 
         }
@@ -93,11 +95,14 @@ class TypeSubsriptionForm(ModelForm):
 class PaymentForm(ModelForm):
     class Meta:
         model = Payment
-        fields = ["Member", "Payment_Date" ]
+        fields = ["Member", "Payment_Date","Mode_of_Payment"]
 
         widgets = {
+
             "Member":Select(attrs={"class":"form-control"}),
+            "Amount":TextInput(attrs={"class":"form-control","type":"number"}),
             "Payment_Date":TextInput(attrs={"class":"form-control","type":"date"}),
+            "Mode_of_Payment":Select(attrs={"class":"form-control"})
         }
 
 

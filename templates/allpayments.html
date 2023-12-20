@@ -30,6 +30,7 @@
                           <tr>
                             <th>Customer</th>
                             <th>Payment Amount</th>
+                            <th>Mode Of Payment</th>
                             <th>Date</th>
                             <th>Status</th>
                             <th>Action</th>
@@ -51,6 +52,7 @@
                             <td>
                               AED {{i.Amount}}
                             </td>
+                            <td>{{i.Mode_of_Payment}}</td>
                             <td>
 {{i.Payment_Date}}
                             </td>
@@ -60,7 +62,14 @@
                             <td>
                               <a href="{%url 'ReceiptGenerate' i.id %}" target="_blank" class="btn btn-outline-warning">Get Receipt</a>
 
-                              <a data-bs-toggle="modal" data-bs-target="#staticBackdropsubperitype" class="btn btn-outline-danger btn-sm">delete</a>
+                              <a data-bs-toggle="modal" data-bs-target="#staticBackdropsubperitype" data-bs-toggle="tooltip"
+                              data-bs-placement="top" title="delete" class="btn btn-outline-danger btn-sm"><i class="mdi mdi-delete"
+                                style="font-size: 15px;"></i></a>
+                                {% if request.user.groups.all.0.name == "admin" %}
+                                <a href="{%url 'EditPayment' i.id %}" class="btn btn-inverse-info btn-icon"
+                                                data-bs-toggle="tooltip" data-bs-placement="top" title="Edit"><i
+                                                    style="font-size: x-large;" class="bi bi-pencil-square"></i></a>
+                                                  {% endif %}
                             </td>
                           </tr>
                               <!-- Modal Sub Period delete -->

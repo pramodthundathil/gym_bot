@@ -7,9 +7,10 @@
 
 <div class="main-panel">
   <div class="content-wrapper pb-0">
-    {% for message in messages  %}
+    {% for message in messages %}
 
-    <div class="alert {{message.tags}} alert-dismissible fade show " style="position:fixed;top:100px;z-index:1;" role="alert">
+    <div class="alert {{message.tags}} alert-dismissible fade show " style="position:fixed;top:100px;z-index:1;"
+      role="alert">
       <strong>Information!</strong> {{message}}
       <button type="button" class="btn btn-close mdi mdi-close text-xxl" data-bs-dismiss="alert"
         aria-label="Close"></button>
@@ -56,8 +57,8 @@
             </div> -->
             <form action="{%url 'ProfilephotoUpdate' member.id %}" enctype="multipart/form-data" method="post">
               {% csrf_token %}
-            <input type="file" name="photo" required class="text-black mt-3 d-block font-weight-medium h6">
-            <button type="submit" class="btn btn-info">Upload New Photo</button>  
+              <input type="file" name="photo" required class="text-black mt-3 d-block font-weight-medium h6">
+              <button type="submit" class="btn btn-info">Upload New Photo</button>
             </form>
           </div>
         </div>
@@ -239,8 +240,10 @@
                           Subscription </a><br><br>
                         <a data-bs-toggle="modal" data-bs-target="#staticBackdrop" class="btn btn-danger">Delete
                           Member</a>
-                          <br><br>
-                          <a href="{%url 'AddPaymentFromMemberTab' member.id %}" class="btn btn-outline-info">Add Payment</a>
+                        <br><br>
+                        <a href="{%url 'AddNewPaymentFromMember' member.id %}" class="btn btn-outline-info">Add
+                          Payment</a>
+                        <a  data-bs-toggle="modal" data-bs-target="#staticBackdrop10" class="btn btn-info">View Payment History</a>
                         <!-- Subscription Chnage Model start  -->
 
                         <!-- Subscription Chnage Model end  -->
@@ -268,12 +271,116 @@
 
                         <!-- end deletepopup ---------------- -->
 
+                        <!-- Modal for payment dispaly -->
+                        <div class="modal fade" id="staticBackdrop10" data-bs-backdrop="static" data-bs-keyboard="false"
+                          tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+                          <div class="modal-dialog modal-xl">
+                            <div class="modal-content">
+                              <div class="modal-header">
+                                <h4 class="modal-title fs-5" id="exampleModalToggleLabel">Payment History {{member}}</h4>
+                                <!-- <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button> -->
+                              </div>
+
+                              <div class="modal-body">
+
+                                <div class="page-header flex-wrap">
+                                  <h3 class="mb-0"> All Payments <span class="pl-0 h6 pl-sm-2 text-muted d-inline-block"></span>
+                                  </h3>
+                                  <button type="button" class="btn btn-close mdi mdi-close text-xxl" data-bs-dismiss="modal"
+              aria-label="Close"></button>
+                              </div>
+                      
+                              <div class="row">
+                                  <div class="col-xl-12 col-sm-6 grid-margin stretch-card">
+                                      <div class="card">
+                                        <div class="card-body px-0 overflow-auto">
+                                          <h4 class="card-title pl-4">All Payments</h4>
+                                          <div class="table-responsive">
+                                            <table class="table">
+                                              <thead class="bg-light">
+                                                <tr>
+                                                
+                                                  <th>Payment Amount</th>
+                                                  <th>Mode Of Payment</th>
+                                                  <th>Date</th>
+                                                  <th>Status</th>
+                                                  <th>Action</th>
+                                                </tr>
+                                              </thead>
+                                              <tbody>
+                                                {% for i in payments %}
+                                                  
+                                                <tr>
+                                                  
+                                                  <td>
+                                                    AED {{i.Amount}}
+                                                  </td>
+                                                  <td>{{i.Mode_of_Payment}}</td>
+                                                  <td>
+                      {{i.Payment_Date}}
+                                                  </td>
+                                                  <td>
+                                                    <div class="badge badge-inverse-success"> Completed </div>
+                                                  </td>
+                                                  <td>
+                                                    <a href="{%url 'ReceiptGenerate' i.id %}" target="_blank" class="btn btn-outline-warning">Get Receipt</a>
+                      
+                                                    <a data-bs-toggle="modal" data-bs-target="#staticBackdropsubperitype" data-bs-toggle="tooltip"
+                                                    data-bs-placement="top" title="delete" class="btn btn-outline-danger btn-sm"><i class="mdi mdi-delete"
+                                                      style="font-size: 15px;"></i></a>
+                                                      {% if request.user.groups.all.0.name == "admin" %}
+                                                      <a href="{%url 'EditPayment' i.id %}" class="btn btn-inverse-info btn-icon"
+                                                                      data-bs-toggle="tooltip" data-bs-placement="top" title="Edit"><i
+                                                                          style="font-size: x-large;" class="bi bi-pencil-square"></i></a>
+                                                                        {% endif %}
+                                                  </td>
+                                                </tr>
+                                                    <!-- Modal Sub Period delete -->
+                                                    <div class="modal fade" id="staticBackdropsubperitype" data-bs-backdrop="static"
+                                                    data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel"
+                                                    aria-hidden="true">
+                                                    <div class="modal-dialog">
+                                                        <div class="modal-content">
+                              
+                                                            <div class="modal-body">
+                                                                Do you Want To delete payment ?
+                                                            </div>
+                                                            <div class="modal-footer">
+                                                                <button type="button" class="btn btn-secondary"
+                                                                    data-bs-dismiss="modal">No</button>
+                                                                <a href="{%url 'DeletePayment' i.id %}" type="button"
+                                                                    class="btn btn-danger">Yes</a>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                {% endfor %}
+                      
+                                              </tbody>
+                                            </table>
+                                          </div>
+                                          <!-- <a class="text-black mt-3 d-block pl-4" href="#">
+                                            <span class="font-weight-medium h6">View all Payments</span>
+                                            <i class="mdi mdi-chevron-right"></i></a> -->
+                                        </div>
+                                      </div>
+                                    </div>
+                                </div> 
+                                
+                              </div>
+                              <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                <!-- <a href="{%url 'DeleteMember' member.id %}" type="button" class="btn btn-danger">Yes</a> -->
+                              </div>
+                            </div>
+                          </div>
+                        </div>
                         <br><br>
                         <a href="{%url 'ExtendAccessToGate' member.id %}" class="btn btn-outline-warning">Extend
                           Access</a>
                         <a href="{%url 'BlockAccess' member.id %}" class="btn btn-outline-dark">Block Access</a>
 
-                       
+
                       </form>
                     </div>
                   </div>
@@ -282,11 +389,12 @@
             </div>
           </div>
         </div>
-        
+
       </div>
       <footer class="footer">
         <div class="d-sm-flex justify-content-center justify-content-sm-between">
-          <span class="text-muted d-block text-center text-sm-left d-sm-inline-block">Copyright © red defend computers</span>
+          <span class="text-muted d-block text-center text-sm-left d-sm-inline-block">Copyright © red defend
+            computers</span>
           <span class="float-none float-sm-right d-block mt-1 mt-sm-0 text-center"> Developed By <a
               href="https://www.betainfotech.com/" target="_blank">red defend computers</a></span>
         </div>
