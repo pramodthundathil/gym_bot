@@ -26,12 +26,12 @@ class MemberAddForm(ModelForm):
         widgets = {
             "First_Name":TextInput(attrs={"class":"form-control"}),
             "Last_Name":TextInput(attrs={"class":"form-control"}),
-            "Date_Of_Birth":TextInput(attrs={"class":"form-control","type":"date"}),
+            "Date_Of_Birth":TextInput(attrs={"class":"form-control","type":"date","max":date}),
             "Gender":Select(attrs={"class":"form-control"}),
             # "Date_Of_Birth":TextInput(attrs={"class":"form-control","type":"date","min":date}),
             "Mobile_Number":TextInput(attrs={"class":"form-control","type":"number"}),
             "Email":TextInput(attrs={"class":"form-control","type":"email"}),
-            "Registration_Date":TextInput(attrs={"class":"form-control","type":"date"}),
+            "Registration_Date":TextInput(attrs={"class":"form-control","type":"date","max":date}),
             # "Address":TextInput(attrs={"class":"form-control",'style': 'height: 3em !importent;'}),
             # "Medical_History":TextInput(attrs={"class":"form-control"}),
             "Photo":FileInput(attrs={"class":"form-control",'accept': 'image/*', 'capture':'camera'}),
@@ -56,7 +56,7 @@ class SubscriptionAddForm(ModelForm):
             "Type_Of_Subscription":Select(attrs={"class":"form-control"}),
             "Period_Of_Subscription":Select(attrs={"class":"form-control"}),
             "Amount":TextInput(attrs={"class":"form-control","type":"number"}),
-            "Subscribed_Date":TextInput(attrs={"class":"form-control","type":"date"}),
+            "Subscribed_Date":TextInput(attrs={"class":"form-control","type":"date","max":date}),
             # "Subscription_End_Date":TextInput(attrs={"class":"form-control","type":"date","min":date}),
             "Batch":Select(attrs={"class":"form-control"}),
 

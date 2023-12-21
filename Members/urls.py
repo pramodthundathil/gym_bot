@@ -41,6 +41,7 @@ urlpatterns = [
     path("AddNewPayment",views.AddNewPayment,name="AddNewPayment"),
     path("PostNewPayment/<int:pk>",views.PostNewPayment,name="PostNewPayment"),
     path("AddNewPaymentFromMember/<int:pk>",views.AddNewPaymentFromMember,name="AddNewPaymentFromMember"),
+    path("IdphotoUpdate/<int:pk>",views.IdphotoUpdate,name="IdphotoUpdate"),
 
 
 

@@ -21,6 +21,7 @@ urlpatterns = [
     path("EditSub/<int:pk>",views.EditSub,name="EditSub"),  
     path("StaffDetails",views.StaffDetails,name="StaffDetails"),
     path("DeleteStaffUser/<int:pk>",views.DeleteStaffUser,name="DeleteStaffUser"),  
+    path("Supports",views.Supports,name="Supports"),
 
 
 

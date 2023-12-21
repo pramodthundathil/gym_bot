@@ -51,6 +51,10 @@
                             </td>
                             <td>
                               AED {{i.Amount}}
+                              {% if i.Payment_Balance > 0 %}
+                              <br>
+                              <small class="text-danger">Payment Balance AED {{i.Payment_Balance}}</small> 
+                              {% endif %}
                             </td>
                             <td>{{i.Mode_of_Payment}}</td>
                             <td>

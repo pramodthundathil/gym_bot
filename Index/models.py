@@ -14,3 +14,8 @@ class ConfigarationDB(models.Model):
 class Logo(models.Model):
     name = models.CharField(max_length=255)
     logo = models.FileField(upload_to='logo')
+
+class Support(models.Model):
+    name = models.CharField(max_length=255)
+    Quary = models.TextField(max_length=2000)
+    date = models.DateField(auto_now_add=True)

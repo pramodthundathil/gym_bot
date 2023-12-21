@@ -70,6 +70,7 @@ class Payment(models.Model):
     Amount = models.IntegerField(null=True, blank=True)
     Mode_of_Payment = models.CharField(max_length = 255, null=True, blank= True, choices = (("Cash","Cash"),("Bank Transfer","Bank Transfer"),("Card","Card")) )
     Payment_Date = models.DateField(auto_now_add=False,null=True,blank=True)
+    Payment_Balance = models.FloatField(default=0)
     Payment_Status = models.BooleanField(default=False)
     Access_status = models.BooleanField(default=False)
 

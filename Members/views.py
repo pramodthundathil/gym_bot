@@ -135,12 +135,23 @@ def Member(request):
         if form.is_valid():
             member = form.save()
             member.save()
+            member.Discount = 0
+            member.save()
         else:
-            messages.error(request,"Entered Personal Data is Not Validated Please try agine")
+            messages.error(request,"Entered Personal Data is Not Validated Please try againe")
             return redirect("Member")
         if sub_form.is_valid():
             sub_data = sub_form.save()
             sub_data.save()
+            start_dat = sub_data.Subscribed_Date
+            if sub_data.Period_Of_Subscription.Category == "Month":
+                # days = sub_data.Period_Of_Subscription
+                sub_data.Subscription_End_Date = start_dat +timedelta(days = (sub_data.Period_Of_Subscription.Period * 30))
+            elif sub_data.Period_Of_Subscription.Category == "Year":
+                # days = sub_data.Period_Of_Subscription
+                sub_data.Subscription_End_Date = start_dat +timedelta(days = (sub_data.Period_Of_Subscription.Period * 365))
+
+
             sub_data.Member = member
             sub_data.save()
             access_gate = AccessToGate.objects.create(Member = member,Subscription = sub_data,Validity_Date = sub_data.Subscription_End_Date )
@@ -220,6 +231,18 @@ def ProfilephotoUpdate(request,pk):
         messages.success(request, "Photo Changed...")
         return redirect("MembersSingleView",pk)
     return redirect("MembersSingleView",pk)
+
+@login_required(login_url='SignIn')
+def IdphotoUpdate(request,pk):
+    if request.method == "POST":
+        file = request.FILES["photo"]
+        member = MemberData.objects.get(id = pk)
+        member.Id_Upload.delete()
+        member.Id_Upload = file
+        member.save()
+        messages.success(request, "Id Proof updated...")
+        return redirect("MembersSingleView",pk)
+    return redirect("MembersSingleView",pk)
     
 
 @login_required(login_url='SignIn')
@@ -265,7 +288,16 @@ def ChangeSubscription(request,pk):
 
             sub_data = sub_form.save()
             sub_data.Member = member
+            start_dat = sub_data.Subscribed_Date
+            if sub_data.Period_Of_Subscription.Category == "Month":
+                # days = sub_data.Period_Of_Subscription
+                sub_data.Subscription_End_Date = start_dat +timedelta(days = (sub_data.Period_Of_Subscription.Period * 30))
+            elif sub_data.Period_Of_Subscription.Category == "Year":
+                # days = sub_data.Period_Of_Subscription
+                sub_data.Subscription_End_Date = start_dat +timedelta(days = (sub_data.Period_Of_Subscription.Period * 365))
             sub_data.save()
+
+
 
             access = AccessToGate.objects.filter(Member = member)
 
@@ -422,7 +454,11 @@ def PostNewPayment(request,pk):
         try:
             amount = request.POST["Custome_amount"]
             payment.Amount = amount
+            balance = float(sub.Amount) - float(amount)
+            print(balance,"-------------------------------------------------")
+            payment.Payment_Balance = balance
             payment.save()
+            
             
         except:
             a = 100
@@ -588,9 +624,11 @@ def FullMemberReport(request):
     member = MemberData.objects.all().order_by("-Date_Added")
     
     writer = csv.writer(response)
-    writer.writerow(['First_Name',"Last_Name","Date_Of_Birth","Gender","Mobile_Number","Email","Address","Medical_History","Registration_Date","Date_Added","Access_Token"])
+    writer.writerow(['First_Name',"Last_Name","Date_Of_Birth","Gender","Mobile_Number","Email","Address","Medical_History","Registration_Date","Date_Added","Access_Token","Subscription","Batch"])
     for i in member:
-        writer.writerow([i.First_Name,i.Last_Name,i.Date_Of_Birth,i.Gender,i.Mobile_Number,i.Email,i.Address,i.Medical_History,i.Registration_Date,i.Date_Added,i.Access_Token_Id])
+        sub = Subscription.objects.get(Member = i)
+        batch = sub.Batch
+        writer.writerow([i.First_Name,i.Last_Name,i.Date_Of_Birth,i.Gender,i.Mobile_Number,i.Email,i.Address,i.Medical_History,i.Registration_Date,i.Date_Added,i.Access_Token_Id,sub,batch])
 
     return response
 
@@ -793,12 +831,15 @@ def PDFmonthpayment(request):
 @login_required(login_url='SignIn')
 def EditPayment(request,pk):
     mypay = Payment.objects.get(id = pk)
+    sub = mypay.Subscription_ID
     if request.method == "POST":
         mode = request.POST["Mode"]
         Amount = request.POST["amount"]
         date = request.POST["date"]
 
         mypay.Amount = Amount
+        balance = float(sub.Amount) - float(Amount)
+        mypay.Payment_Balance = balance
         mypay.Mode_of_Payment = mode 
         mypay.Payment_Date = date
         mypay.save()
@@ -872,6 +913,9 @@ def DeletespecialDiscount(request,pk):
     member.save()
     messages.success(request,"Discount Deleted")
     return redirect("Discount")
+
+
+
 
 
 

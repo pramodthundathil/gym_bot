@@ -3,14 +3,17 @@ from django.contrib import messages
 from django.contrib.auth.models import User, Group
 from django.http import HttpResponse
 from django.contrib.auth import authenticate,login,logout
-from Members.models import Subscription_Period, Subscription, Batch_DB, TypeSubsription,MemberData,Payment, AccessToGate
+from Members.models import Subscription_Period, Subscription, Batch_DB, TypeSubsription,MemberData,Payment, AccessToGate, Discounts
 from Members.forms import Subscription_PeriodForm, BatchForm, TypeSubsriptionForm
 from datetime import datetime, timedelta
 from django.utils import timezone
-from .models import ConfigarationDB
+from .models import ConfigarationDB, Support
 from Members.views import ScheduledTask
 from .decorator import unautenticated_user, allowed_users
 from django.contrib.auth.decorators import login_required
+from django.core.mail import EmailMessage
+from django.template.loader import render_to_string
+
 
 
 this_month = timezone.now().month
@@ -24,6 +27,7 @@ def Home(request):
     members = MemberData.objects.all()
     month = datetime.now().strftime('%B')
     notification_payments = Payment.objects.filter(Payment_Date__gte = start_date,Payment_Date__lte = end_date )
+    disc = Discounts.objects.filter(Till_Date__lte = end_date)
 
     subscrib = Subscription.objects.filter(Subscription_End_Date__lte = end_date)
     for i in subscrib:
@@ -45,7 +49,14 @@ def Home(request):
     payment = Payment.objects.filter(Payment_Date__month = this_month)
     for i in payment:
         collected_amount += i.Amount
-        
+
+    for d in disc:
+        d.delete()
+    else:
+        members.update(Discount = 0)
+
+    
+    
     ScheduledTask()
     context = {
         "subscribers":subscribers,
@@ -313,3 +324,30 @@ def DeleteStaffUser(request,pk):
     User.objects.get(id = pk).delete()
     messages.info(request,"User Deleted...")
     return redirect("StaffDetails")
+
+
+# support for users 
+
+def Supports(request):
+    if request.method == "POST":
+        name = request.POST['name']
+        quary = request.POST['qury']
+
+        support = Support.objects.create(name = name,Quary = quary)
+        support.save()
+
+        mail_subject = 'Ticket Generated - EMMY- FITNESS'
+        message = render_to_string('emailbody.html', {'name': name,
+                                                      "email":quary,
+                                                      "date":datetime.now(),
+                                                      "message":quary,
+                                                      "id":support.id
+                                                      })
+
+        email = EmailMessage(mail_subject, message, to=['gopinath.pramod@gmail.com','support@reddefend.ae'])
+        email.send(fail_silently=True)
+        
+        messages.info(request,"Support mail Sent")
+        return redirect("Supports")
+
+    return render(request,"support.html")
