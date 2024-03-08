@@ -44,7 +44,7 @@ urlpatterns = [
     path("IdphotoUpdate/<int:pk>",views.IdphotoUpdate,name="IdphotoUpdate"),
 
 
-
+    path("FeePendingMembers",views.FeePendingMembers,name="FeePendingMembers"),
 
     
 ]

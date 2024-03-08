@@ -21,7 +21,7 @@ class TypeSubsription(models.Model):
 
 class Subscription_Period(models.Model):
     Period = models.PositiveIntegerField()
-    Category = models.CharField(max_length=255, choices=(("Month","Month"),("Year","Year")))
+    Category = models.CharField(max_length=255, choices=(("Day","Day"),("Week","Week"),("Month","Month"),("Year","Year")))
 
     def __str__(self):
         return (str(self.Period) + " " +str(self.Category))

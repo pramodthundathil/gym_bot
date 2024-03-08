@@ -611,6 +611,12 @@ def AllPayments(request):
     return render(request,"allpayments.html",{"payments":payments})
 
 
+
+@login_required(login_url='SignIn')
+def FeePendingMembers(request):
+    subscribers = Subscription.objects.all()
+
+    return render(request,"feependingmembers.html",{"subscribers":subscribers})
 # Reports generation
 
 @login_required(login_url='SignIn')
@@ -622,14 +628,21 @@ def FullMemberReport(request):
     response['Content-Disposition'] = 'attachment; filename=Memberreportfull{}-{}.csv'.format(date,date_year)
     
     member = MemberData.objects.all().order_by("-Date_Added")
-    
+    def generate_serial_number():
+        current_time = datetime.now()
+        serial_number = current_time.strftime("%Y%m%d%H%M%S")
+        return serial_number
+    TokenU = generate_serial_number()
     writer = csv.writer(response)
-    writer.writerow(['First_Name',"Last_Name","Date_Of_Birth","Gender","Mobile_Number","Email","Address","Medical_History","Registration_Date","Date_Added","Access_Token","Subscription","Batch"])
+    writer.writerow(["Sl No",'First_Name',"Last_Name","Date_Of_Birth","Gender","Mobile_Number","Email","Address","Registration_Date","Date_Added","Access_Token","Subscription","Batch"])
+    counter = 0
     for i in member:
         sub = Subscription.objects.get(Member = i)
         batch = sub.Batch
-        writer.writerow([i.First_Name,i.Last_Name,i.Date_Of_Birth,i.Gender,i.Mobile_Number,i.Email,i.Address,i.Medical_History,i.Registration_Date,i.Date_Added,i.Access_Token_Id,sub,batch])
-
+        counter +=1
+        writer.writerow([counter,i.First_Name,i.Last_Name,i.Date_Of_Birth,i.Gender,i.Mobile_Number,i.Email,i.Address,i.Registration_Date,i.Date_Added,i.Access_Token_Id,sub,batch])
+    response.write('\n')  # Move to the next line after the first row
+    response.write(f"Doc Number: {TokenU}")  # Write the unique report number to the next line
     return response
 
 
@@ -640,13 +653,24 @@ def MonthMemberReport(request):
     date_year = timezone.now().year
     response = HttpResponse(content_type = 'text/csv')
     response['Content-Disposition'] = 'attachment; filename=Memberreportmonth{}-{}.csv'.format(date,date_year)
+    counter = 0
     
     member = MemberData.objects.filter(Date_Added__month = date).order_by("-Date_Added")
     
     writer = csv.writer(response)
-    writer.writerow(['First_Name',"Last_Name","Date_Of_Birth","Gender","Mobile_Number","Email","Address","Medical_History","Registration_Date","Date_Added","Access_Token"])
+    writer.writerow(["Sl No",'First_Name',"Last_Name","Date_Of_Birth","Gender","Mobile_Number","Email","Address","Medical_History","Registration_Date","Date_Added","Access_Token"])
     for i in member:
-        writer.writerow([i.First_Name,i.Last_Name,i.Date_Of_Birth,i.Gender,i.Mobile_Number,i.Email,i.Address,i.Medical_History,i.Registration_Date,i.Date_Added,i.Access_Token_Id])
+        counter +=1
+        writer.writerow([counter,i.First_Name,i.Last_Name,i.Date_Of_Birth,i.Gender,i.Mobile_Number,i.Email,i.Address,i.Medical_History,i.Registration_Date,i.Date_Added,i.Access_Token_Id])
+
+    def generate_serial_number():
+        current_time = datetime.now()
+        serial_number = current_time.strftime("%Y%m%d%H%M%S")
+        return serial_number
+    TokenU = generate_serial_number()
+
+    response.write('\n')  # Move to the next line after the first row
+    response.write(f"Doc Number: {TokenU}")  # Write the unique report number to the next line
 
     return response
 
@@ -660,14 +684,24 @@ def DateWiseMemberReport(request):
         sdate = request.POST["sdate"]
         edate = request.POST["enddate"]
         
-
+    counter = 0
     member = MemberData.objects.filter(Date_Added__gte = sdate,Date_Added__lte = edate ).order_by("-Date_Added")
     
     writer = csv.writer(response)
-    writer.writerow(['First_Name',"Last_Name","Date_Of_Birth","Gender","Mobile_Number","Email","Address","Medical_History","Registration_Date","Date_Added","Access_Token"])
+    writer.writerow(["Slno",'First_Name',"Last_Name","Date_Of_Birth","Gender","Mobile_Number","Email","Address","Medical_History","Registration_Date","Date_Added","Access_Token"])
     for i in member:
-        writer.writerow([i.First_Name,i.Last_Name,i.Date_Of_Birth,i.Gender,i.Mobile_Number,i.Email,i.Address,i.Medical_History,i.Registration_Date,i.Date_Added,i.Access_Token_Id])
+        counter +=1
+        writer.writerow([counter,i.First_Name,i.Last_Name,i.Date_Of_Birth,i.Gender,i.Mobile_Number,i.Email,i.Address,i.Medical_History,i.Registration_Date,i.Date_Added,i.Access_Token_Id])
 
+
+    def generate_serial_number():
+        current_time = datetime.now()
+        serial_number = current_time.strftime("%Y%m%d%H%M%S")
+        return serial_number
+    TokenU = generate_serial_number()
+    response.write('\n')  # Move to the next line after the first row
+    response.write(f"Doc Number: {TokenU}")  # Write the unique report number to the next line
+    
     return response
 
 
@@ -680,15 +714,23 @@ def DateWisePaymentReport(request):
     if request.method == "POST":
         sdate = request.POST["sdate"]
         edate = request.POST["enddate"]
-        
+        counter = 0
     
         payment = Payment.objects.filter(Payment_Date__gte = sdate,Payment_Date__lte = edate ).order_by("-Payment_Date")
         
         writer = csv.writer(response)
-        writer.writerow(["Member","Subscription_ID","Amount","Payment_Date"])
+        writer.writerow(["Slno","Member","Subscription_ID","Amount","Payment_Date"])
         for i in payment:
-            writer.writerow([i.Member,i.Subscription_ID,i.Amount,i.Payment_Date])
+            counter +=1
+            writer.writerow([counter,i.Member,i.Subscription_ID,i.Amount,i.Payment_Date])
 
+        def generate_serial_number():
+            current_time = datetime.now()
+            serial_number = current_time.strftime("%Y%m%d%H%M%S")
+            return serial_number
+        TokenU = generate_serial_number()
+        response.write('\n')  # Move to the next line after the first row
+        response.write(f"Doc Number: {TokenU}") 
         return response
     return HttpResponse("No Valid Fiels")
     
@@ -698,15 +740,25 @@ def PaymentReport(request):
     date_year = timezone.now().year
     response = HttpResponse(content_type = 'text/csv')
     response['Content-Disposition'] = 'attachment; filename=paymentreportfull{}-{}.csv'.format(date,date_year)
-    
+    counter = 0
         
     try:
         payment = Payment.objects.all().order_by("-Payment_Date")
         
         writer = csv.writer(response)
-        writer.writerow(["Member","Subscription_ID","Amount","Payment_Date"])
+        writer.writerow(["Slno","Member","Subscription_ID","Amount","Payment_Date"])
         for i in payment:
-            writer.writerow([i.Member,i.Subscription_ID,i.Amount,i.Payment_Date])
+            counter +=1
+            writer.writerow([counter,i.Member,i.Subscription_ID,i.Amount,i.Payment_Date])
+
+        
+        def generate_serial_number():
+            current_time = datetime.now()
+            serial_number = current_time.strftime("%Y%m%d%H%M%S")
+            return serial_number
+        TokenU = generate_serial_number()
+        response.write('\n')  # Move to the next line after the first row
+        response.write(f"Doc Number: {TokenU}") 
 
         return response
     except:
@@ -719,16 +771,25 @@ def PaymentReportMonth(request):
     date_year = timezone.now().year
     response = HttpResponse(content_type = 'text/csv')
     response['Content-Disposition'] = 'attachment; filename=paymentreportmonth{}-{}.csv'.format(date,date_year)
-    
+    counter = 0
         
     try:
         payment = Payment.objects.filter(Payment_Date__month = date ).order_by("-Payment_Date")
         
         writer = csv.writer(response)
-        writer.writerow(["Member","Subscription_ID","Amount","Payment_Date"])
+        writer.writerow(["SlNo","Member","Subscription_ID","Amount","Payment_Date"])
         for i in payment:
-            writer.writerow([i.Member,i.Subscription_ID,i.Amount,i.Payment_Date])
+            counter += 1
+            writer.writerow([counter,i.Member,i.Subscription_ID,i.Amount,i.Payment_Date])
 
+        
+        def generate_serial_number():
+            current_time = datetime.now()
+            serial_number = current_time.strftime("%Y%m%d%H%M%S")
+            return serial_number
+        TokenU = generate_serial_number()
+        response.write('\n')  # Move to the next line after the first row
+        response.write(f"Doc Number: {TokenU}") 
         return response
     except:
         return HttpResponse("No Valid Fiels")
@@ -740,9 +801,14 @@ def PDFprintFullMemberReport(request):
     date_year = timezone.now().year
     member = MemberData.objects.all()
     template_path = "reportpdf_fulldata.html"
-
+    def generate_serial_number():
+        current_time = datetime.now()
+        serial_number = current_time.strftime("%Y%m%d%H%M%S")
+        return serial_number
+    TokenU = generate_serial_number()
     context = {
-       "member":member
+       "member":member,
+       "Token":TokenU
     }
     response = HttpResponse(content_type = "application/pdf")
     response['Content-Disposition'] = "filename=Memberreportfull{}-{}.pdf".format(date,date_year)
@@ -762,9 +828,15 @@ def PDFprintFullPaymentReport(request):
     date_year = timezone.now().year
     payment = Payment.objects.all()
     template_path = "reportpdf_fulldata_payment.html"
+    def generate_serial_number():
+        current_time = datetime.now()
+        serial_number = current_time.strftime("%Y%m%d%H%M%S")
+        return serial_number
+    TokenU = generate_serial_number()
 
     context = {
-       "payment":payment
+       "payment":payment,
+       "Token":TokenU
     }
     response = HttpResponse(content_type = "application/pdf")
     response['Content-Disposition'] = "filename=Paymentreportfull{}-{}.pdf".format(date,date_year)
@@ -783,10 +855,16 @@ def PDFmonthMember(request):
     date_year = timezone.now().year
     member = MemberData.objects.filter(Date_Added__month = date)
     template_path = "reportPDFmonthMember.html"
+    def generate_serial_number():
+        current_time = datetime.now()
+        serial_number = current_time.strftime("%Y%m%d%H%M%S")
+        return serial_number
+    TokenU = generate_serial_number()
 
     context = {
        "member":member,
-       "date":date
+       "date":date,
+       "Token":TokenU
     }
     response = HttpResponse(content_type = "application/pdf")
     response['Content-Disposition'] = "filename=Memberreportmonth{}-{}.pdf".format(date,date_year)
@@ -806,10 +884,16 @@ def PDFmonthpayment(request):
     date_year = timezone.now().year
     payment = Payment.objects.filter(Payment_Date__month = date)
     template_path = "reportPDFmonthpayment.html"
+    def generate_serial_number():
+        current_time = datetime.now()
+        serial_number = current_time.strftime("%Y%m%d%H%M%S")
+        return serial_number
+    TokenU = generate_serial_number()
 
     context = {
        "payment":payment,
-       "date":date
+       "date":date,
+       "Token":TokenU
     }
     response = HttpResponse(content_type = "application/pdf")
     response['Content-Disposition'] = "filename=Paymentreportmonth{}-{}.pdf".format(date,date_year)

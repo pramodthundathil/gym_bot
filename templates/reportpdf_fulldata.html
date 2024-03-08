@@ -19,9 +19,11 @@
 </head>
 <body>
     <h3 style="text-align: center;">Member Details</h3>
+    <h4>Number {{Token}}</h4>
 
     <table>
         <tr>
+            <th>Sl no</th>
             <th>First Name</th>
             <th>Last Name</th>
             <th>Date Of Birth</th>
@@ -37,6 +39,7 @@
         {% for i in member  %}
           
         <tr>
+            <th>{{forloop.counter}}</th>
             <td>{{i.First_Name}}</td>
             <td>{{i.Last_Name}}</td>
             <td>{{i.Date_Of_Birth}}</td>
