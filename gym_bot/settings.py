@@ -13,6 +13,8 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 from pathlib import Path
 import os
 from django.contrib.messages import constants as messages
+import dj_database_url
+
 # import pymysql
 
 
@@ -44,6 +46,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'Index.apps.IndexConfig',
     'Members.apps.MembersConfig',
+    'Finance.apps.FinanceConfig',
 ]
 
 
@@ -97,6 +100,8 @@ DATABASES = {
         'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
+# database = "postgres://koyeb-adm:dwy7E4jQNqVX@ep-plain-wind-a2dg3t13.eu-central-1.pg.koyeb.app/Emmy_Db"
+# DATABASES["default"] = dj_database_url.parse(database)
 
 
 
@@ -153,6 +158,7 @@ STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
 
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_USE_TLS = True

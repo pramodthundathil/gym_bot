@@ -20,55 +20,83 @@ this_month = timezone.now().month
 end_date = timezone.now()
 start_date = end_date + timedelta(days=-7)
 
+from datetime import datetime
+from django.db.models import Sum
 
 @login_required(login_url='SignIn')
 def Home(request):
-    subscribers = Subscription.objects.all()[:8][::-1]
+    # Get the first 8 subscribers in reverse order directly
+    subscribers = Subscription.objects.order_by('-id')[:8]
+    subscribers_pending = Subscription.objects.filter(Payment_Status = False).order_by('-id')[:9]
     members = MemberData.objects.all()
     month = datetime.now().strftime('%B')
-    notification_payments = Payment.objects.filter(Payment_Date__gte = start_date,Payment_Date__lte = end_date )
-    disc = Discounts.objects.filter(Till_Date__lte = end_date)
-
-    subscrib = Subscription.objects.filter(Subscription_End_Date__lte = end_date)
-    for i in subscrib:
-        i.Payment_Status = False
-        i.save()
-        # print("hrlloooooooooooo")
-        access = AccessToGate.objects.get(Subscription = i)
-        access.Status = False
-        access.save()
-
-    access = AccessToGate.objects.filter(Validity_Date__lte = end_date )
-
-    for i in access:
-        i.Status = False
-        i.save()
-
-    collected_amount = 0
-
-    payment = Payment.objects.filter(Payment_Date__month = this_month)
-    for i in payment:
-        collected_amount += i.Amount
-
-    for d in disc:
-        d.delete()
-    else:
-        members.update(Discount = 0)
-
     
+    # Assuming start_date and end_date are defined elsewhere in your code
+    notification_payments = Payment.objects.filter(Payment_Date__gte=start_date, Payment_Date__lte=end_date)
+    disc = Discounts.objects.filter(Till_Date__lte=end_date)
+
+    # Bulk update Payment_Status and AccessToGate status
+    subscrib = Subscription.objects.filter(Subscription_End_Date__lte=end_date)
+    subscrib.update(Payment_Status=False)
+
+    # access_ids = subscrib.values_list('AccessToGate__id', flat=True)
+    AccessToGate.objects.filter(Subscription__in=list(subscrib)).update(Status=False)
+
+    access = AccessToGate.objects.filter(Validity_Date__lte=end_date)
+    access.update(Status=False)
+
+    # Aggregate collected amount
+    this_month = datetime.now().month
+    # collected_amount = Payment.objects.filter(Payment_Date__month=this_month).aggregate(Sum('Amount'))['Amount__sum'] or 0
+    now = datetime.now()
+    current_month = now.month
+    current_year = now.year
+    collected_amount = Payment.objects.filter(
+        Payment_Date__month=current_month,
+        Payment_Date__year=current_year
+    ).aggregate(Sum('Amount'))['Amount__sum'] or 0
+    # Delete discounts and update member discounts in bulk
+    disc.delete()
+    members.update(Discount=0)
     
-    ScheduledTask()
+    print("return... the task")
+    # Count active members
+    active_count = MemberData.objects.filter(Active_status=True).count()
+
+    # Count inactive members
+    inactive_count = MemberData.objects.filter(Active_status=False).count()
+
     context = {
-        "subscribers":subscribers,
-        "membercount":members.count(),
-        "feepending":Subscription.objects.filter(Payment_Status = False).count(),
-        "month":month,
-        "collected_amount":collected_amount,
-        "notification_payments":notification_payments,
-        "notificationcount":notification_payments.count()
+        "subscribers": subscribers,
+        "subscribers_pending":subscribers_pending,
+        "membercount": members.count(),
+        "feepending": Subscription.objects.filter(Payment_Status=False).count(),
+        "month": month,
+        "collected_amount": collected_amount,
+        "notification_payments": notification_payments,
+        "notificationcount": notification_payments.count(),
+        "current_year":current_year,
+        "active_count": active_count,
+        "inactive_count": inactive_count,
     }
 
-    return render(request,"index.html",context)
+    return render(request, "index.html", context)
+
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+
+@csrf_exempt
+def trigger_scheduled_task(request):
+    if request.method == 'POST':
+        try:
+            ScheduledTask()  # Call your function here
+            return JsonResponse({'status': 'success', 'message': 'Task executed successfully'})
+        except Exception as e:
+            return JsonResponse({'status': 'error', 'message': str(e)})
+    else:
+        return JsonResponse({'status': 'error', 'message': 'Invalid request method'})
+
+
 
 @login_required(login_url='SignIn')
 def Setting_Module(request):
@@ -80,7 +108,18 @@ def Setting_Module(request):
     batch = Batch_DB.objects.all()
     speriod = Subscription_Period.objects.all()
     Sub_type = TypeSubsription.objects.all()
-    config = ConfigarationDB.objects.get(id = 1)
+    try:
+        config = ConfigarationDB.objects.all()[0]
+    except:
+        config = ConfigarationDB.objects.create(
+                JWT_IP="192.168.1.1",
+                JWT_PORT="8080",
+                Call_Back_IP="192.168.1.2",
+                Call_Back_Port="9090",
+                Admin_Username="admin_user",
+                Admin_Password="securepassword123"
+            )
+        config.save()
 
 
     context = {

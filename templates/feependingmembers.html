@@ -21,13 +21,14 @@
 
         <div class="row">
             <div class="col-xl-12 col-sm-6 grid-margin stretch-card">
-                <div class="card" style="height: 500px;">
+                <div class="card" style="padding: 20px;">
                   <div class="card-body px-0 overflow-auto">
                     <h4 class="card-title pl-4">Fee Pending Members</h4>
                     <div class="table-responsive">
-                      <table class="table">
+                      <table class="table" id="memberTable">
                         <thead class="bg-light">
                           <tr>
+                            <th>Sl No</th>
                             <th>Member</th>
                             <th>Subscrption Type</th>
                             <th>Subscrption End Date</th>
@@ -39,11 +40,13 @@
                           {% for sub in subscribers  %}  
                           {% if sub.Payment_Status == False %}
                           <tr>
+                            <th>{{forloop.counter}}</th>
                             <td>
                               <div class="d-flex align-items-center">
-                                <img src="{{sub.Member.Photo.url}}" alt="image" />
+                                <img src="{{sub.Member.Photo.url}}" alt="image" id="photoclient" />
                                 <div class="table-user-name ml-3">
-                                  <p class="mb-0 font-weight-medium"> {{sub.Member.First_Name}} {{sub.Member.Last_Name}} </p>
+                                  <b>{{sub.Member.First_Name}} {{sub.Member.Last_Name}}</b>
+                                  <br>
                                   {% if sub.Payment_Status == False %}
                                   <small class="text-danger"> Payment Not Completed</small>
                                   {% else %}
@@ -65,7 +68,11 @@
                               {% endif %}
                             </td>
                             <td>
+                              {% if sub.Member %}
                                 <a href="{%url 'MembersSingleView' sub.Member.id %}" class="btn btn-outline-info">View</a>
+                                {% else%} 
+                                <span>No Member</span>
+                                {% endif %}
                             </td>
                           </tr>
                           {% endif %}
@@ -81,4 +88,24 @@
           </div> 
     </div>
 </div>
+<!-- jQuery (must be loaded first) -->
+<script src="{%static 'assets\js\jquery-3.6.0.min.js' %}"></script>
+
+
+<!-- DataTables CSS -->
+<link rel="stylesheet" href="{%static 'assets\css\jquery.dataTables.min.css' %}">
+
+<!-- DataTables JS (load after jQuery) -->
+<script src="{%static 'assets\js\jquery.dataTables.min.js' %}"></script>
+
+<script>
+    $(document).ready(function() {
+        if ($.fn.DataTable) {
+            console.log("DataTable is loaded.");
+            $('#memberTable').DataTable();
+        } else {
+            console.error("DataTable is not loaded.");
+        }
+    });
+</script>
 {% endblock %}

@@ -11,6 +11,7 @@ from Members import urls
 urlpatterns = [
     path('admin/', admin.site.urls),
     path("",include("Index.urls")),
-    path("members/",include(Members.urls))
+    path("members/",include(Members.urls)),
+    path("finance/",include('Finance.urls')),
 ]
 urlpatterns = urlpatterns+static(settings.MEDIA_URL, document_root = settings.MEDIA_ROOT)

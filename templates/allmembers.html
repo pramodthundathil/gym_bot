@@ -21,15 +21,16 @@
 
         <div class="row">
             <div class="col-xl-12 col-sm-6 grid-margin stretch-card">
-              <div class="card" style="height: 500px;">
+              <div class="card" style="padding: 20px !important;">
                 <div class="card-body px-0 overflow-auto">
                   <h4 class="card-title pl-4">Members</h4>
                   <div class="table-responsive">
-                    <table class="table">
+                    <table class="table" id="memberTable">
                       <thead class="bg-light">
                         <tr>
+                          <th>Sl no</th>
                           <th>Member</th>
-
+                          <th>Phone Number</th>
                           <th>Subscrption End Date</th>
                           <th>Status</th>
                           <th>View</th>
@@ -38,12 +39,14 @@
                       <tbody>
                         {% for sub in member  %}  
                         <tr>
+                          <th>{{forloop.counter}}</th>
                           <td>
                             <div class="d-flex align-items-center">
-                              <img src="{{sub.Photo.url}}" alt="image" />
+
+                              <img src="{{sub.Photo.url}}" alt="image"  id="photoclient"/>
                               <div class="table-user-name ml-3">
                                 <p class="mb-0 font-weight-medium"> {{sub.First_Name}} {{sub.Last_Name}} </p>
-                                {% if sub.Payment_Status == False %}
+                                {% if sub.Active_status == False %}
                                 <small class="text-danger"> Payment Not Completed</small>
                                 {% else %}
                                 <small> Payment Done</small>
@@ -51,6 +54,9 @@
                                 {% endif %}
                               </div>
                             </div>
+                          </td>
+                          <td>
+                            {{sub.Mobile_Number}}
                           </td>
                      
                           <td>
@@ -81,4 +87,26 @@
           </div> 
     </div>
 </div>
+
+<!-- jQuery (must be loaded first) -->
+<script src="{%static 'assets\js\jquery-3.6.0.min.js' %}"></script>
+
+
+<!-- DataTables CSS -->
+<link rel="stylesheet" href="{%static 'assets\css\jquery.dataTables.min.css' %}">
+
+<!-- DataTables JS (load after jQuery) -->
+<script src="{%static 'assets\js\jquery.dataTables.min.js' %}"></script>
+
+<script>
+    $(document).ready(function() {
+        if ($.fn.DataTable) {
+            console.log("DataTable is loaded.");
+            $('#memberTable').DataTable();
+        } else {
+            console.error("DataTable is not loaded.");
+        }
+    });
+</script>
+
 {% endblock %}

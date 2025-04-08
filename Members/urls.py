@@ -4,6 +4,7 @@ from .import views
 urlpatterns = [
     path("Member",views.Member,name="Member"),
     path("Payments",views.Payments,name="Payments"),
+    path('search_members/', views.search_members, name='search_members'),
     path("MembersSingleView/<int:pk>",views.MembersSingleView,name="MembersSingleView"),
     path("MemberAccess",views.MemberAccess,name="MemberAccess"),
     path("DeletePayment/<int:pk>",views.DeletePayment,name="DeletePayment"),
@@ -45,6 +46,11 @@ urlpatterns = [
 
 
     path("FeePendingMembers",views.FeePendingMembers,name="FeePendingMembers"),
+
+    path("make_balance_payment/<int:pk>",views.make_balance_payment,name="make_balance_payment"),
+    path("get_balance_receipt/<int:pk>",views.get_balance_receipt,name="get_balance_receipt"),
+    path("api_call",views.api_call,name="api_call"),
+    
 
     
 ]

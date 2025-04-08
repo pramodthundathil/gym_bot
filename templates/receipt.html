@@ -6,147 +6,296 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Payment Receipt</title>
+    <title>EMMY FITNESS - Payment Receipt</title>
     <style>
-        .container{
-            display: flex;
-            justify-content: space-evenly;
-        }
-        .item{
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
         
+        :root {
+            --primary-color: #4361ee;
+            --secondary-color: #ef476f;
+            --text-color: #121212;
+            --text-muted: #6c757d;
+            --border-color: #e0e0e0;
+            --background-light: #f8f9fa;
+            --white: #ffffff;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Poppins', Arial, Helvetica, sans-serif;
+            background-color: #f5f5f5;
+            color: var(--text-color);
+            line-height: 1.4;
+            font-size: 10px;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: var(--white);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            overflow: hidden;
+            page-break-after: always;
+        }
+        
+        .receipt {
+            padding: 0;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, var(--primary-color), #3a0ca3);
+            color: white;
+            padding: 10px 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .logo {
+            background-color: white;
+            padding: 5px;
+            border-radius: 5px;
+            width: 60px;
             height: auto;
         }
-        body {
-            font-family: Arial, Helvetica, sans-serif;
-            
+        
+        .company-name {
+            font-size: 18px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
         }
-
-        p {
-            line-height: 1px;
+        
+        .company-address {
+            background-color: var(--background-light);
+            padding: 8px 15px;
+            font-size: 8px;
+            color: var(--text-muted);
+            border-bottom: 1px solid var(--border-color);
         }
-
-        .receipt {
-            padding: 10px;
-            margin: auto;
-
-        }
-
-        .center-h6 {
-            border-top: .5px solid black;
-            border-bottom: .5px solid black;
-            padding: 5px;
-
-        }
-
-        .card-head p {
-            font-size: smaller;
-        }
-
-        .card-body h4 {
-            color: blue;
-            line-height: 2px;
-        }
-
-        .card-body table {
-            width: 100%;
-
-        }
-
-        .card-body th {
-            text-align: left;
-        }
-
-        .card-body td {
-            text-align: right;
-        }
-        .headder{
+        
+        .receipt-info {
             display: flex;
+            justify-content: space-between;
+            padding: 8px 15px;
+            background-color: var(--background-light);
+            border-bottom: 1px solid var(--border-color);
         }
-        table, th, td{
-            border: .5px solid gray;
+        
+        .vat-number {
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+        
+        .receipt-number {
+            font-weight: 600;
+        }
+        
+        .receipt-date {
+            font-weight: 500;
+        }
+        
+        .member-info {
+            padding: 8px 15px;
+            background-color: var(--primary-color);
+            color: white;
+            text-align: center;
+            font-weight: 600;
+        }
+        
+        .card-body {
+            padding: 12px 15px;
+        }
+        
+        .package-heading {
+            color: var(--primary-color);
+            font-weight: 600;
+            margin-bottom: 5px;
+            font-size: 12px;
+        }
+        
+        .package-info {
+            background-color: var(--background-light);
+            padding: 8px 10px;
+            border-radius: 5px;
+            margin-bottom: 10px;
+            border-left: 3px solid var(--primary-color);
+            font-size: 9px;
+        }
+        
+        .dates {
+            display: flex;
+            justify-content: space-between;
+            margin: 8px 0;
+            font-size: 9px;
+        }
+        
+        .date-label {
+            color: var(--primary-color);
+            font-weight: 600;
+            margin-right: 5px;
+        }
+        
+        .payment-table {
+            width: 100%;
             border-collapse: collapse;
+            margin: 10px 0;
+            font-size: 9px;
         }
-        td{
+        
+        .payment-table th, .payment-table td {
+            padding: 6px 8px;
             text-align: left;
-            font-weight: bold !important;
+            border: 1px solid var(--border-color);
         }
-       
+        
+        .payment-table th {
+            background-color: var(--primary-color);
+            color: white;
+            font-weight: 600;
+        }
+        
+        .payment-table td:last-child {
+            text-align: right;
+            font-weight: 400 !important;
+        }
+        
+        .payment-table tr:last-child {
+            background-color: var(--background-light);
+            font-weight: 700;
+        }
+        
+        .payment-table tr:last-child td {
+            border-top: 2px solid var(--primary-color);
+        }
+        
+        .signature {
+            margin-top: 15px;
+            text-align: left;
+            padding-top: 8px;
+            border-top: 1px dashed var(--border-color);
+            font-size: 9px;
+        }
+        
+        .thank-you {
+            margin: 8px 0;
+            font-weight: 600;
+            color: var(--primary-color);
+            font-size: 12px;
+        }
+        
+        .footer {
+            background-color: var(--background-light);
+            padding: 8px 15px;
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 8px;
+            border-top: 1px solid var(--border-color);
+        }
+        
+        @media print {
+            body {
+                background-color: white;
+                margin: 0;
+                padding: 0;
+            }
+            
+            .container {
+                width: 100%;
+                box-shadow: none;
+                border-radius: 0;
+            }
+        }
     </style>
 </head>
 
 <body>
     <div class="container">
-        <div class="item">
-.
-        </div>
-        <div class="receipt item">
-            <div class="card-head">
-                <div class="headder">
-                    <div class="item">
-                <img src="{{logo.logo.path}}" style="width:150px;display:block;margin:auto;" alt="">
-
+        <div class="receipt">
+            <div class="header">
+                <div class="logo-container">
+                    <img src="{{logo.logo.url}}" class="logo" alt="EMMY FITNESS Logo">
+                    <div class="company-name" style="margin-left: 40px;">EMMY WOMAN BODY FITNESS</div>
+                </div>
+            </div>
+            
+            <div class="company-address">
+                VILLA-78 SULTHANBIN WIZAISH, AL DHAHARI St. AL MUWAIJI-OUD BIN SAG-HAN, BESIDE AL MA'MOUN MEDICAL CENTER<br>
+                UNITED ARAB EMIRATES | Phone: 03 7367119 | Mobile: +971-505084384 | Email: emmybodyfitness@gmail.com | Web: www.bodyforcealain.com
+            </div>
+            
+            <div class="receipt-info">
+                <div class="vat-number">VAT #000000</div>
+                <div class="receipt-number">RECEIPT #{{payid}}</div>
+                <div class="receipt-date">Date: {{payment_date}}</div>
+            </div>
+            
+            <div class="member-info">
+                Member ID: #{{payid}} | Member: {{member}}
+            </div>
+            
+            <div class="card-body">
+                <div class="package-heading">Package Details</div>
+                <div class="package-info">
+                    <div>{{period}} | Reference: #{{payid}}</div>
+                </div>
+                
+                <div class="dates">
+                    <div>
+                        <span class="date-label">From:</span>
+                        <span class="date-value">{{payment_date}}</span>
                     </div>
-                    <div class="item">
-                        <span style="color: blue;font-size: xx-large;">EMMY WOMAN BODY FITNESS</span>
+                    <div>
+                        <span class="date-label">To:</span>
+                        <span class="date-value">{{sub_end}}</span>
                     </div>
                 </div>
-                <span style="color: gray;">
-                VILLA-78 SULTHANBIN WIZAISH, AL DHAHARI St. AL MUWAIJI-OUD BIN SAG-HAN, BESIDE AL MA'MOUN MEDICAL CENTER <br>
-                UNITED ARAB EMIRATES
-                Phone:03 7367119, MOB:+971-505084384,E-mail:emmybodyfitness@gmail.com, Web:www.bodyforcealain.com
-<hr></span>
+                
+                <table class="payment-table">
+                    <tr>
+                        <th>Description</th>
+                        <th>Amount</th>
+                    </tr>
+                    <tr>
+                        <td>{{period}} Membership</td>
+                        <td>AED {{amount}}</td>
+                    </tr>
+                    <tr>
+                        <td>VAT (0%)</td>
+                        <td>AED 0.00</td>
+                    </tr>
+                    <tr>
+                        <td>Total Amount</td>
+                        <td>AED {{amount}}</td>
+                    </tr>
+                </table>
+                
+                <div class="thank-you">Thank You For Your Business!</div>
+                
+                <div class="signature">
+                    <div>Regards,</div>
+                    <br>
+                    <div>EMMY FITNESS</div>
+                </div>
+            </div>
             
-                <span style="text-align: center;font-size: large;font-weight: 600;"> VAT #000000 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
-                <h6 style="display: inline-block;"> VAT RECEIPT # {{payid}}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</h6>
-                <span style="text-align: right;font-size: medium;font-weight: 600;" > Date: {{payment_date}}&nbsp;&nbsp;&nbsp;&nbsp;</span>
+            <div class="footer">
+                This receipt is computer generated and does not require physical signature.
             </div>
-
-            <h6 class="center-h6" style="text-align: center;"><span>{{payid}} #</span> <span>{{member}}</span></h6>
-
-            <div class="card-body">
-                <h4 style="color: blue;">Package:</h4>
-                <p>{{period}}</p>
-                <p>{{payid}}# <br> from {{payment_date}} to {{sub_end}} </p>
-                <h4>From: <span style="color: black;font-weight:200 ;">{{payment_date}}</span></h4>
-                <h4>To: <span style="color: black;font-weight:200 ;">{{sub_end}}</span></h4>
-                <table>
-                    <tr>
-                        <th>
-                            <h4>Amount:</h4>
-                        </th>
-                        <td>
-                            <span style="color: black;font-weight:200 ;">AED {{amount}}</span>
-                        </td>
-                    </tr>
-                    <tr>
-                        <th>
-                            <h4>Vat %:</h4>
-                        </th>
-                        <td>
-                            <span style="color: black;font-weight:200 ;">AED 0.00</span>
-                        </td>
-                    </tr>
-                    <tr>
-                        <th>
-                            <h4>Total: </h4>
-                        </th>
-                        <td>
-                            <span style="color: black;font-weight:200 ;">AED {{amount}}</span>
-                        </td>
-                    </tr>
-                </table><br><br><br>
-
-                Thanks, <br><br><br>
-
-                EMMY FITNESS
-
-            </div>
-
-        </div>
-        <div class="item">
-.
         </div>
     </div>
 </body>
-
 </html>

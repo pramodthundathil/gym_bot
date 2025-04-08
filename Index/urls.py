@@ -22,6 +22,7 @@ urlpatterns = [
     path("StaffDetails",views.StaffDetails,name="StaffDetails"),
     path("DeleteStaffUser/<int:pk>",views.DeleteStaffUser,name="DeleteStaffUser"),  
     path("Supports",views.Supports,name="Supports"),
+    path('trigger-task/', views.trigger_scheduled_task, name='trigger-task'),
 
 
 

@@ -28,88 +28,115 @@ notification_payments = Payment.objects.filter(Payment_Date__gte = start_date,Pa
 
 
 def ScheduledTask():
+    try:
+        confdata = ConfigarationDB.objects.get(id=1)
+    except ConfigarationDB.DoesNotExist:
+        confdata = {
+            "JWT_IP": '0',
+            "JWT_PORT": "0",
+            "Call_Back_IP": '0',
+            "Call_Back_Port": "0",
+            "Admin_Username": "",
+            "Admin_Password": ""
+        }
 
-    confdata = ConfigarationDB.objects.get(id = 1)
-
-    # get jwt token on local host Ztehodevice 
-    url = f'http://{confdata.JWT_IP}:{confdata.JWT_PORT}/jwt-api-token-auth/'
+    # Get JWT token on local host Ztehodevice
+    url = f'http://http://127.0.0.1:80/jwt-api-token-auth/'
     print(url)
     header1 = {
         'Content-Type': 'application/json'
-        }
+    }
     token = "nil"
     body = {
         "username": confdata.Admin_Username,
         "password": confdata.Admin_Password
     }
     json_payload = json.dumps(body)
+
     try:
-        response = requests.post(url,headers = header1,data = json_payload)
+        response = requests.post(url, headers=header1, data=json_payload)
         if response.status_code == 200:
             print('Request successful!')
-            token_dict = json.load(response)
+            token_dict = response.json()
             token = token_dict['token']
-            print(response.json())
+            print(token_dict)
         else:
-            print("no connection")
-
-    except:
-        print("No connection")
+            print("No connection")
+    except requests.RequestException:
+        print("No connection........")
     
+    urlforapi = 'http://http://127.0.0.1:80/api-token-auth/'
+    header2 = {
+        'Content-Type': 'application/json',
+        'Authorization': f'{token}'
+    }
+    try:
+        tokenresponse = requests.post(urlforapi, headers=header2,data=json_payload)
+        if tokenresponse.status_code == 200:
+            token_val = tokenresponse.json()
+            mytoken = token_val['token']
+    except:
+        print("No connection...")
+        mytoken = 0
+
     headers = {
         'Content-Type': 'application/json',
-        'Authorization': 'JWT {}'.format(token)
+        'Authorization': f'Token {mytoken}'
     }
 
-    subscrib = Subscription.objects.filter(Subscription_End_Date__lte = end_date)
-    for i in subscrib:
-        i.Payment_Status = False
-        i.save()
-        # print("hrlloooooooooooo")
-        access = AccessToGate.objects.get(Subscription = i)
-        access.Status = False
-        access.save() 
+    end_date = datetime.now()  # Assuming end_date is current datetime, adjust as necessary
+    resign_date = datetime.now()  # Assuming resign_date is current datetime, adjust as necessary
+
+    subscrib = Subscription.objects.filter(Subscription_End_Date__lte=end_date)
+    subscriptions_to_update = []
+    access_to_update = []
+
+    for subscription in subscrib:
+        subscription.Payment_Status = False
+        subscriptions_to_update.append(subscription)
+        subscription.Member.update_active_status()
+        try:
+            access = AccessToGate.objects.get(Subscription=subscription)
+            access.Status = False
+            access_to_update.append(access)
+        except AccessToGate.DoesNotExist:
+            continue
+
+    Subscription.objects.bulk_update(subscriptions_to_update, ['Payment_Status'])
+    AccessToGate.objects.bulk_update(access_to_update, ['Status'])
 
     acc = AccessToGate.objects.all()
-    for i in acc:
-        if i.Status == False:
-            accessid = i.Member.Access_Token_Id
-            url = f"http://{confdata.Call_Back_IP}:{confdata.Call_Back_Port}/personal/api/resigns/"
-            print(url)
-            data = {
-                "employee":accessid,
-                "disableatt":True,
-                "resign_type":1,
-                "resign_date":str(resign_date),
-                "reason":"Payment Pending",
-            }
-            json_payload = json.dumps(data)
-            try:
-                respose = requests.patch(url, hedders = headers, data = json_payload)
-                if respose.status_code == 200:
-                    print("Succeed...")
-                else:
-                    print("Failed.....")
-            except:
-                print("no connection")
-        else:
-            accessid = i.Member.Access_Token_Id
-            url = f"http://{confdata.Call_Back_IP}:{confdata.Call_Back_Port}/personal/api/resigns/reinstatement/"
-            print(url)
-            data = {
-                "resigns":[accessid]
-            }
-            json_payload = json.dumps(data)
-            try:
-                respose = requests.patch(url, hedders = headers, data = json_payload)
-                if respose.status_code == 200:
-                    print("Succeed...")
-                else:
-                    print("Failed.....")
-            except:
-                print("no connection")
 
-    
+    with requests.Session() as session:
+        for access in acc:
+            accessid = access.Member.Access_Token_Id
+            if access.Status is False:
+                url = f"http://127.0.0.1:80/personnel/api/resigns/"
+                data = {
+                    "employee": accessid,
+                    "disableatt": True,
+                    "resign_type": 1,
+                    "resign_date": str(resign_date),
+                    "reason": "Payment Pending",
+                }
+            else:
+                url = f"http://127.0.0.1:80/personnel/api/reinstatement/"
+                data = {
+                    "resigns": [accessid]
+                }
+
+            json_payload = json.dumps(data)
+
+            try:
+                response = session.patch(url, headers=headers, data=json_payload)
+                if response.status_code == 200:
+                    print("Succeed...")
+                else:
+                    print("Failed.....")
+            except requests.RequestException:
+                print("No connection from resigns")
+                break
+
     print("workinggggg.....")
 
             
@@ -119,70 +146,83 @@ def ScheduledTask():
 
 # member configarations and subscription add on same method 
 # one forign key field is prent in subscription Meber forign key, priod forign key, Batch forgin key
-#
+
+from Finance.models import Income, Expence
+
 @login_required(login_url='SignIn')
 def Member(request):
     form = MemberAddForm()
     sub_form = SubscriptionAddForm()
     Trainee = MemberData.objects.all()[:8][::-1]
     subscribers = Subscription.objects.all()[:8][::-1]
-    notification_payments = Payment.objects.filter(Payment_Date__gte = start_date,Payment_Date__lte = today )
-
+    notification_payments = Payment.objects.filter(Payment_Date__gte = start_date, Payment_Date__lte = today)
 
     if request.method == "POST":
-        form = MemberAddForm(request.POST,request.FILES)
+        form = MemberAddForm(request.POST, request.FILES)
         sub_form = SubscriptionAddForm(request.POST)
-        if form.is_valid():
+        if form.is_valid() and sub_form.is_valid():
             member = form.save()
-            member.save()
             member.Discount = 0
             member.save()
-        else:
-            messages.error(request,"Entered Personal Data is Not Validated Please try againe")
-            return redirect("Member")
-        if sub_form.is_valid():
+            
             sub_data = sub_form.save()
-            sub_data.save()
             start_dat = sub_data.Subscribed_Date
+            
+            # Calculate end date based on any category
             if sub_data.Period_Of_Subscription.Category == "Month":
-                # days = sub_data.Period_Of_Subscription
-                sub_data.Subscription_End_Date = start_dat +timedelta(days = (sub_data.Period_Of_Subscription.Period * 30))
+                sub_data.Subscription_End_Date = start_dat + timedelta(days=(sub_data.Period_Of_Subscription.Period * 30))
             elif sub_data.Period_Of_Subscription.Category == "Year":
-                # days = sub_data.Period_Of_Subscription
-                sub_data.Subscription_End_Date = start_dat +timedelta(days = (sub_data.Period_Of_Subscription.Period * 365))
-
-
+                sub_data.Subscription_End_Date = start_dat + timedelta(days=(sub_data.Period_Of_Subscription.Period * 365))
+            elif sub_data.Period_Of_Subscription.Category == "Week":
+                sub_data.Subscription_End_Date = start_dat + timedelta(days=(sub_data.Period_Of_Subscription.Period * 7))
+            elif sub_data.Period_Of_Subscription.Category == "Day":
+                sub_data.Subscription_End_Date = start_dat + timedelta(days=sub_data.Period_Of_Subscription.Period)
+            else:
+                # Default fallback - set to 30 days if category is unknown
+                sub_data.Subscription_End_Date = start_dat + timedelta(days=30)
+                
             sub_data.Member = member
             sub_data.save()
-            access_gate = AccessToGate.objects.create(Member = member,Subscription = sub_data,Validity_Date = sub_data.Subscription_End_Date )
+            
+            # Now we're sure Subscription_End_Date has a value
+            access_gate = AccessToGate.objects.create(
+                Member=member,
+                Subscription=sub_data,
+                Validity_Date=sub_data.Subscription_End_Date
+            )
             access_gate.save()
-            messages.success(request,"New Member Was Added Successfully Please Make Payment")
-            return redirect("Member") 
-        else:    
-            messages.error(request,"Entered Subscription Data is Not Validated Please try agine")
-            return redirect("Member") 
-
-         
+            
+            messages.success(request, "New Member Was Added Successfully Please Make Payment")
+            return redirect("Member")
+        else:
+            if not form.is_valid():
+                messages.error(request, "Entered Personal Data is Not Validated Please try again")
+            if not sub_form.is_valid():
+                messages.error(request, "Entered Subscription Data is Not Validated Please try again")
+            return redirect("Member")
+            
     context = {
-        "notification_payments":notification_payments,
-        "form":form,
-        "sub_form":sub_form,
-        "Trainee":Trainee,
-        "subscribers":subscribers,
-        "notificationcount":notification_payments.count()
-
-
-        }
-    return render(request,"members.html",context)
+        "notification_payments": notification_payments,
+        "form": form,
+        "sub_form": sub_form,
+        "Trainee": Trainee,
+        "subscribers": subscribers,
+        "notificationcount": notification_payments.count()
+    }
+    return render(request, "members.html", context)
 
 @login_required(login_url='SignIn')
 def MembersSingleView(request,pk):
     member = MemberData.objects.get(id = pk)
     subscription = Subscription.objects.get(Member = member)
-    access = AccessToGate.objects.get(Member = member)
+    try:
+        access = AccessToGate.objects.get(Member = member)
+    except:
+        access = AccessToGate.objects.create(Member = member,Subscription = subscription,Validity_Date = datetime.now()) 
+        access.save()
     sub_form = SubscriptionAddForm()
     payments = Payment.objects.filter(Member = member)
-    ScheduledTask()
+    
 
     context = {
         "member":member,
@@ -385,19 +425,52 @@ def Payments(request):
     }
     return render(request, "payments.html",context)
 
+
+# Add this view to your views.py
+from django.http import JsonResponse
+from django.db.models import Q
+
+def search_members(request):
+    search_term = request.GET.get('term', '')
+    
+    if len(search_term) < 2:
+        return JsonResponse([], safe=False)
+    
+    members = MemberData.objects.filter(
+        Q(First_Name__icontains=search_term) | 
+        Q(Last_Name__icontains=search_term)
+    )
+    
+    results = []
+    for member in members:
+        results.append({
+            'id': member.id,
+            'name': f"{member.First_Name} {member.Last_Name}"
+        })
+    
+    return JsonResponse(results, safe=False)
+
 @login_required(login_url='SignIn')
 def AddNewPayment(request):
     if request.method == "POST":
-        mid = request.POST["member"]
-        member = MemberData.objects.get(id = mid)
-        Sub = Subscription.objects.get(Member = member)
+        try:
+            mid = request.POST["member"]
+            member = MemberData.objects.get(id = mid)
+            Sub = Subscription.objects.get(Member = member)
 
-        context = {
-            "member":member,
-            "sub":Sub,
-            "discounted":Sub.Amount - (Sub.Amount*member.Discount)/100
-        }
-        return render(request,"paymentscreen.html",context)
+            context = {
+                "member":member,
+                "sub":Sub,
+                "discounted":Sub.Amount - (Sub.Amount*member.Discount)/100
+            }
+            return render(request,"paymentscreen.html",context)
+        except:
+            messages.error(request, "Member is not exists")
+            return redirect("Payments")
+    else:
+        messages.info(request, "Please select member to continue...")
+        return redirect("Payments")
+
     
 @login_required(login_url='SignIn')
 def AddNewPaymentFromMember(request,pk):
@@ -434,14 +507,20 @@ def PostNewPayment(request,pk):
         user = payment.Member
         user.Access_status = True
         user.save()
+        
 
         try:
-            sub_date = request.POST["sub_extendate"]
-            access.Validity_Date = sub_date
-            access.save()
-           
-            sub.Subscription_End_Date = sub_date
-            sub.save()
+            sub_date = request.POST.get("sub_extendate")
+            if sub_date:
+                access.Validity_Date = sub_date
+                access.save()
+            
+                sub.Subscription_End_Date = sub_date
+                sub.save()
+            else:
+                sub_date = sub.Subscription_End_Date
+                access.Validity_Date = sub_date
+                access.save()
 
         except:
             sub_date = sub.Subscription_End_Date
@@ -452,12 +531,14 @@ def PostNewPayment(request,pk):
         sub.save()
 
         try:
-            amount = request.POST["Custome_amount"]
-            payment.Amount = amount
-            balance = float(sub.Amount) - float(amount)
-            print(balance,"-------------------------------------------------")
-            payment.Payment_Balance = balance
-            payment.save()
+             
+            amount = request.POST.get("Custome_amount")
+            if amount:
+                payment.Amount = amount
+                balance = float(sub.Amount) - float(amount)
+                print(balance,"-------------------------------------------------")
+                payment.Payment_Balance = balance
+                payment.save()
             
             
         except:
@@ -471,11 +552,32 @@ def PostNewPayment(request,pk):
             access.Status = False 
         access.save()
         ScheduledTask()
+        print(payment.Amount,"------------------------------------")
 
-        messages.success(request,"Payment Updated for member {}".format(user))
+        income = Income.objects.create(perticulers = f"Payment from {member} by {payment.Mode_of_Payment}",amount = payment.Amount,date = date)
+        income.save()
+
+        messages.success(request,"Payment Updated for member: {}".format(user))
         return redirect("Payments")
 
     return redirect("Payments")
+
+from .models import BalancePayment
+
+def make_balance_payment(request, pk):
+    payment = Payment.objects.get(id=pk)
+    balance = payment.Payment_Balance
+    if request.method == "POST":
+        payment.Payment_Status = True
+        payment.Payment_Balance = 0
+        payment.save() 
+        balance_bill = BalancePayment.objects.create(payment = payment,Amount = balance)
+        balance_bill.save()
+
+        income = Income.objects.create(perticulers = f"Payment from {payment.Member} by {payment.Mode_of_Payment}",amount = balance)
+        income.save()
+        messages.success(request,"Balance Payment Updated for member {}".format(payment.Member))
+        return redirect("AllPayments")
 
 @login_required(login_url='SignIn')
 def AddPaymentFromMemberTab(request,pk):
@@ -494,9 +596,10 @@ def AddPaymentFromMemberTab(request,pk):
         user.save()
 
         try:
-            sub_date = request.POST["sub_extendate"]
-            access.Validity_Date = sub_date
-            access.save()
+            sub_date = request.POST.get("sub_extendate")
+            if sub_date:
+                access.Validity_Date = sub_date
+                access.save()
 
         except:
             sub_date = sub.Subscription_End_Date
@@ -514,6 +617,9 @@ def AddPaymentFromMemberTab(request,pk):
             access.Status = False 
         access.save()
         ScheduledTask()
+
+        income = Income.objects.create(perticulers = f"Payment from {member}",amount = payment.Amount,date = date)
+        income.save()
         messages.success(request,"Payment Updated for member {}".format(user))
         return redirect("MembersSingleView",pk)
 
@@ -525,45 +631,218 @@ def AddPaymentFromMemberTab(request,pk):
 
 # creating receipt for payment 
 
-@login_required(login_url='SignIn')
-def ReceiptGenerate(request,pk):
-    logo = Logo.objects.get(id = 1)
-    payment  = Payment.objects.get(id = pk)
+# @login_required(login_url='SignIn')
+# def ReceiptGenerate(request,pk):
+#     logo = Logo.objects.get(id = 1)
+#     payment  = Payment.objects.get(id = pk)
+#     member = payment.Member
+#     amount  = payment.Amount
+#     payid  = pk
+#     payment_date = payment.Payment_Date
+#     try:
+#         sub_start = payment.Subscription_ID.Subscribed_Date
+#         sub_end = payment.Subscription_ID.Subscription_End_Date
+#         period = payment.Subscription_ID.Period_Of_Subscription
+#     except:
+#         sub_start = "Null"
+#         sub_end = "Null"
+#         period = "Null"
+#     template_path = "receipt.html"
+
+#     context = {
+#        "member":member,
+#        "amount":amount,
+#        "payid":payid,
+#        "payment_date":payment_date,
+#        "sub_start":sub_start,
+#        "sub_end":sub_end,
+#        "period":period,
+#        "pk":pk,
+#        "logo":logo
+#     }
+#     response = HttpResponse(content_type = "application/pdf")
+#     response['Content-Disposition'] = 'filename=f"payment_receipt_{member}.pdf"'
+#     template = get_template(template_path)
+#     html = template.render(context)
+
+#     # create PDF
+#     pisa_status = pisa.CreatePDF(html, dest = response)
+#     if pisa_status.err:
+#         return HttpResponse("we are some erros <pre>" + html + '</pre>')
+#     return response
+
+
+def get_balance_receipt(request, pk):
+    """
+    Generate a professional PDF receipt for a payment.
+    Uses WeasyPrint for higher quality PDF generation with better CSS support.
+    """
+    # Get necessary data
+    logo = Logo.objects.get(id=1)
+    balance_ = BalancePayment.objects.get(id=pk)
+    payment = balance_.payment
     member = payment.Member
-    amount  = payment.Amount
-    payid  = pk
+    amount = balance_.Amount
+    payid = pk
     payment_date = payment.Payment_Date
+    
     try:
         sub_start = payment.Subscription_ID.Subscribed_Date
         sub_end = payment.Subscription_ID.Subscription_End_Date
         period = payment.Subscription_ID.Period_Of_Subscription
     except:
-        sub_start = "Null"
-        sub_end = "Null"
-        period = "Null"
-    template_path = "receipt.html"
-
+        sub_start = "N/A"
+        sub_end = "N/A"
+        period = "N/A"
+    
+    # Generate barcode for receipt
+    import barcode
+    from barcode.writer import ImageWriter
+    import base64
+    from io import BytesIO
+    
+    # Create EAN13 barcode (you can use other formats too)
+    ean = barcode.get_barcode_class('code128')
+    ean_barcode = ean(f'OYAFITNESS{payid}', writer=ImageWriter())
+    
+    # Convert barcode to base64 for embedding in HTML
+    buffer = BytesIO()
+    ean_barcode.write(buffer)
+    buffer.seek(0)
+    barcode_image = base64.b64encode(buffer.getvalue()).decode('utf-8')
+    
+    # Prepare context for template
     context = {
-       "member":member,
-       "amount":amount,
-       "payid":payid,
-       "payment_date":payment_date,
-       "sub_start":sub_start,
-       "sub_end":sub_end,
-       "period":period,
-       "pk":pk,
-       "logo":logo
+       "member": member,
+       "amount": amount,
+       "payid": payid,
+       "payment_date": payment_date,
+       "sub_start": sub_start,
+       "sub_end": sub_end,
+       "period": period,
+       "barcode_image": barcode_image,
+       "logo": logo,
+       "balance":"balance"
     }
-    response = HttpResponse(content_type = "application/pdf")
-    response['Content-Disposition'] = 'filename=f"payment_receipt_{member}.pdf"'
+    
+    # Render template to HTML
+    template_path = "receipt.html"
     template = get_template(template_path)
     html = template.render(context)
+    
+    # Generate PDF using WeasyPrint for better CSS support
+    try:
+        from weasyprint import HTML, CSS
+        from django.conf import settings
+        import os
+        
+        # Create response object
+        response = HttpResponse(content_type="application/pdf")
+        response['Content-Disposition'] = f'attachment; filename="payment_receipt_{member}_{payid}.pdf"'
+        
+        # Generate PDF with WeasyPrint
+        base_url = request.build_absolute_uri('/')
+        pdf = HTML(string=html, base_url=base_url).write_pdf()
+        
+        # Write PDF to response
+        response.write(pdf)
+        return response
+        
+    except ImportError:
+        # Fallback to xhtml2pdf if WeasyPrint is not available
+        response = HttpResponse(content_type="application/pdf")
+        response['Content-Disposition'] = f'attachment; filename="payment_receipt_{member}_{payid}.pdf"'
+        pisa_status = pisa.CreatePDF(html, dest=response)
+        
+        if pisa_status.err:
+            return HttpResponse("We encountered some errors <pre>" + html + '</pre>')
+        return response
 
-    # create PDF
-    pisa_status = pisa.CreatePDF(html, dest = response)
-    if pisa_status.err:
-        return HttpResponse("we are some erros <pre>" + html + '</pre>')
-    return response
+@login_required(login_url='SignIn')
+def ReceiptGenerate(request, pk):
+    """
+    Generate a professional PDF receipt for a payment.
+    Uses WeasyPrint for higher quality PDF generation with better CSS support.
+    """
+    # Get necessary data
+    logo = Logo.objects.get(id=1)
+    payment = Payment.objects.get(id=pk)
+    member = payment.Member
+    amount = payment.Amount
+    payid = pk
+    payment_date = payment.Payment_Date
+    
+    try:
+        sub_start = payment.Subscription_ID.Subscribed_Date
+        sub_end = payment.Subscription_ID.Subscription_End_Date
+        period = payment.Subscription_ID.Period_Of_Subscription
+    except:
+        sub_start = "N/A"
+        sub_end = "N/A"
+        period = "N/A"
+    
+    # Generate barcode for receipt
+    import barcode
+    from barcode.writer import ImageWriter
+    import base64
+    from io import BytesIO
+    
+    # Create EAN13 barcode (you can use other formats too)
+    ean = barcode.get_barcode_class('code128')
+    ean_barcode = ean(f'OYAFITNESS{payid}', writer=ImageWriter())
+    
+    # Convert barcode to base64 for embedding in HTML
+    buffer = BytesIO()
+    ean_barcode.write(buffer)
+    buffer.seek(0)
+    barcode_image = base64.b64encode(buffer.getvalue()).decode('utf-8')
+    
+    # Prepare context for template
+    context = {
+       "member": member,
+       "amount": amount,
+       "payid": payid,
+       "payment_date": payment_date,
+       "sub_start": sub_start,
+       "sub_end": sub_end,
+       "period": period,
+       "barcode_image": barcode_image,
+       "logo": logo,
+       "balance":" "
+    }
+    
+    # Render template to HTML
+    template_path = "receipt.html"
+    template = get_template(template_path)
+    html = template.render(context)
+    
+    # Generate PDF using WeasyPrint for better CSS support
+    try:
+        from weasyprint import HTML, CSS
+        from django.conf import settings
+        import os
+        
+        # Create response object
+        response = HttpResponse(content_type="application/pdf")
+        response['Content-Disposition'] = f'attachment; filename="payment_receipt_{member}_{payid}.pdf"'
+        
+        # Generate PDF with WeasyPrint
+        base_url = request.build_absolute_uri('/')
+        pdf = HTML(string=html, base_url=base_url).write_pdf()
+        
+        # Write PDF to response
+        response.write(pdf)
+        return response
+        
+    except ImportError:
+        # Fallback to xhtml2pdf if WeasyPrint is not available
+        response = HttpResponse(content_type="application/pdf")
+        response['Content-Disposition'] = f'attachment; filename="payment_receipt_{member}_{payid}.pdf"'
+        pisa_status = pisa.CreatePDF(html, dest=response)
+        
+        if pisa_status.err:
+            return HttpResponse("We encountered some errors <pre>" + html + '</pre>')
+        return response
 
 @login_required(login_url='SignIn')
 def DeletePayment(request,pk):
@@ -916,14 +1195,19 @@ def PDFmonthpayment(request):
 def EditPayment(request,pk):
     mypay = Payment.objects.get(id = pk)
     sub = mypay.Subscription_ID
+    print("sub----------------------------",sub)
     if request.method == "POST":
         mode = request.POST["Mode"]
         Amount = request.POST["amount"]
         date = request.POST["date"]
 
         mypay.Amount = Amount
-        balance = float(sub.Amount) - float(Amount)
-        mypay.Payment_Balance = balance
+        print(mypay.Amount)
+        try:
+            balance = float(sub.Amount) - float(Amount)
+            mypay.Payment_Balance = balance
+        except:
+            pass
         mypay.Mode_of_Payment = mode 
         mypay.Payment_Date = date
         mypay.save()
@@ -1007,3 +1291,31 @@ def DeletespecialDiscount(request,pk):
     
 
 
+
+
+#    Api call for node mcu access to gate
+from django.shortcuts import render,redirect
+from django.http import HttpResponse, JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+
+
+@csrf_exempt
+def api_call(request):
+    if request.method == "POST":
+        token = request.POST["token"]
+        member = MemberData.objects.get(Access_Token_Id = token)
+        # access = AccessToGate.objects.get(Member = member)
+        # access.Status = True
+        # access.save()
+
+        access = member.Access_status
+        if access == True:
+            # access.Status = True
+            # access.save()
+            return JsonResponse({"status": True, "member": member.First_Name})
+        else:
+            # access.Status = False
+            # access.save()
+            return JsonResponse({"status": False})
+
+    return JsonResponse({"status": False})
