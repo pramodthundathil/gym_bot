@@ -1329,7 +1329,7 @@ def api_call(request):
                 }
     
             message = render_to_string(template, context)
-            email = EmailMessage(mail_subject, message, to=['gopinath.pramod@gmail.com'])
+            email = EmailMessage(mail_subject, message, to=['gopinath.pramod@gmail.com','anazksunil2@gmail.com'])
             email.content_subtype = "html"
             email.send(fail_silently=True)
 
