@@ -1297,7 +1297,9 @@ def DeletespecialDiscount(request,pk):
 from django.shortcuts import render,redirect
 from django.http import HttpResponse, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
-
+from django.conf import settings
+from django.core.mail import send_mail,EmailMessage
+from django.template.loader import render_to_string
 
 @csrf_exempt
 def api_call(request):
@@ -1307,15 +1309,30 @@ def api_call(request):
         # access = AccessToGate.objects.get(Member = member)
         # access.Status = True
         # access.save()
-
-        access = member.Access_status
+        try:
+            access = member.Access_status
+        except:
+            access = False
         if access == True:
             # access.Status = True
             # access.save()
+
             return JsonResponse({"status": True, "member": member.First_Name})
         else:
             # access.Status = False
             # access.save()
+            mail_subject = 'NEW RFID DETECTED '
+            template = 'email_for_rfid.html'
+            context = {
+            'rfid_number': token,
+            
+                }
+    
+            message = render_to_string(template, context)
+            email = EmailMessage(mail_subject, message, to=['gopinath.pramod@gmail.com'])
+            email.content_subtype = "html"
+            email.send(fail_silently=True)
+
             return JsonResponse({"status": False})
 
     return JsonResponse({"status": False})
