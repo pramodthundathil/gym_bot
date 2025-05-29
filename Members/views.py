@@ -1305,7 +1305,11 @@ from django.template.loader import render_to_string
 def api_call(request):
     if request.method == "POST":
         token = request.POST["token"]
-        member = MemberData.objects.get(Access_Token_Id = token)
+        print(token,"0000000000000000000000000000")
+        try:
+            member = MemberData.objects.get(Access_Token_Id = token)
+        except:
+            access = False
         # access = AccessToGate.objects.get(Member = member)
         # access.Status = True
         # access.save()
@@ -1313,6 +1317,7 @@ def api_call(request):
             access = member.Access_status
         except:
             access = False
+            
         if access == True:
             # access.Status = True
             # access.save()
@@ -1329,7 +1334,7 @@ def api_call(request):
                 }
     
             message = render_to_string(template, context)
-            email = EmailMessage(mail_subject, message, to=['emmysforrfid@gmail.com'])
+            email = EmailMessage(mail_subject, message, to=['emmysforrfid@gmail.com',"gopinath.pramod@gmail.com"])
             email.content_subtype = "html"
             email.send(fail_silently=True)
 
