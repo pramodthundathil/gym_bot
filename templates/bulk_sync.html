@@ -1,0 +1,720 @@
+<!-- bulk_sync.html - Fixed Version -->
+{% extends 'index.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <!-- Add CSRF token -->
+    {% csrf_token %}
+    
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header pb-0">
+                    <div class="d-flex align-items-center">
+                        <h4 class="mb-0">🔄 Bulk Sync Members to Device</h4>
+                        <div class="ms-auto">
+                            <button class="btn btn-info btn-sm" onclick="refreshStats()">
+                                <i class="fas fa-sync-alt"></i> Refresh Stats
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <!-- Statistics Cards -->
+                    <div class="row mb-4">
+                        <div class="col-lg-3 col-md-6 col-sm-6">
+                            <div class="card">
+                                <div class="card-body p-3">
+                                    <div class="row">
+                                        <div class="col-8">
+                                            <div class="numbers">
+                                                <p class="text-sm mb-0 text-uppercase font-weight-bold">Total Members</p>
+                                                <h5 class="font-weight-bolder" id="total-members">
+                                                    {{ total_members }}
+                                                </h5>
+                                            </div>
+                                        </div>
+                                        <div class="col-4 text-end">
+                                            <div class="icon icon-shape bg-gradient-primary shadow-primary text-center rounded-circle">
+                                                <i class="ni ni-single-02 text-lg opacity-10"></i>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-md-6 col-sm-6">
+                            <div class="card">
+                                <div class="card-body p-3">
+                                    <div class="row">
+                                        <div class="col-8">
+                                            <div class="numbers">
+                                                <p class="text-sm mb-0 text-uppercase font-weight-bold">Active Members</p>
+                                                <h5 class="font-weight-bolder text-success" id="active-members">
+                                                    {{ total_active_members }}
+                                                </h5>
+                                            </div>
+                                        </div>
+                                        <div class="col-4 text-end">
+                                            <div class="icon icon-shape bg-gradient-success shadow-success text-center rounded-circle">
+                                                <i class="ni ni-check-bold text-lg opacity-10"></i>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-md-6 col-sm-6">
+                            <div class="card">
+                                <div class="card-body p-3">
+                                    <div class="row">
+                                        <div class="col-8">
+                                            <div class="numbers">
+                                                <p class="text-sm mb-0 text-uppercase font-weight-bold">Device Access</p>
+                                                <h5 class="font-weight-bolder text-info" id="device-access">
+                                                    {{ members_with_access }}
+                                                </h5>
+                                            </div>
+                                        </div>
+                                        <div class="col-4 text-end">
+                                            <div class="icon icon-shape bg-gradient-info shadow-info text-center rounded-circle">
+                                                <i class="ni ni-key-25 text-lg opacity-10"></i>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-md-6 col-sm-6">
+                            <div class="card">
+                                <div class="card-body p-3">
+                                    <div class="row">
+                                        <div class="col-8">
+                                            <div class="numbers">
+                                                <p class="text-sm mb-0 text-uppercase font-weight-bold">Need Sync</p>
+                                                <h5 class="font-weight-bolder text-warning" id="need-sync">
+                                                    {{ total_active_members|add:"-"|add:members_with_access }}
+                                                </h5>
+                                            </div>
+                                        </div>
+                                        <div class="col-4 text-end">
+                                            <div class="icon icon-shape bg-gradient-warning shadow-warning text-center rounded-circle">
+                                                <i class="ni ni-settings-gear-65 text-lg opacity-10"></i>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Live Status Log -->
+                    <div class="card mb-4" id="status-log-card" style="display: none;">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0">📝 Live Status Updates</h5>
+                            <button class="btn btn-sm btn-secondary" onclick="clearStatusLog()">
+                                <i class="fas fa-trash"></i> Clear Log
+                            </button>
+                        </div>
+                        <div class="card-body" style="max-height: 300px; overflow-y: auto;">
+                            <div id="status-log" class="font-monospace small">
+                                <!-- Status updates will appear here -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Bulk Sync Control Panel -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="mb-0">🚀 Device Synchronization Control</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-8">
+                                    <div class="alert alert-info">
+                                        <i class="fas fa-info-circle"></i>
+                                        <strong>What this will do:</strong>
+                                        <ul class="mb-0 mt-2">
+                                            <li>Sync all active members with valid subscriptions to the access device</li>
+                                            <li>Update member access status in the database</li>
+                                            <li>Skip members without active subscriptions</li>
+                                            <li>Provide detailed progress and error reporting</li>
+                                            <li>Show real-time status updates during the process</li>
+                                        </ul>
+                                    </div>
+                                    
+                                    <div class="alert alert-warning" style="display: none;" id="warning-alert">
+                                        <i class="fas fa-exclamation-triangle"></i>
+                                        <strong>Warning:</strong> This process may take several minutes depending on the number of members.
+                                        Please don't close this page during the sync.
+                                    </div>
+                                </div>
+                                <div class="col-md-4 text-center">
+                                    <button class="btn btn-lg btn-primary mb-3" id="start-sync-btn" onclick="startBulkSync()">
+                                        <i class="fas fa-sync-alt"></i> Start Bulk Sync
+                                    </button>
+                                    <br>
+                                    <button class="btn btn-secondary mb-2" onclick="testDeviceConnection()">
+                                        <i class="fas fa-plug"></i> Test Device Connection
+                                    </button>
+                                    <br>
+                                    <button class="btn btn-warning btn-sm" id="stop-sync-btn" onclick="stopBulkSync()" style="display: none;">
+                                        <i class="fas fa-stop"></i> Stop Sync
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Enhanced Progress Section -->
+                    <div class="card mt-4" id="progress-section" style="display: none;">
+                        <div class="card-header">
+                            <h5 class="mb-0">📊 Sync Progress</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="progress mb-3" style="height: 30px;">
+                                        <div class="progress-bar progress-bar-striped progress-bar-animated bg-primary" 
+                                             id="sync-progress" role="progressbar" style="width: 0%">
+                                            <span id="progress-text" class="fw-bold">Starting...</span>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Current Processing Info -->
+                                    <div class="alert alert-light border mb-3" id="current-processing" style="display: none;">
+                                        <div class="d-flex align-items-center">
+                                            <div class="spinner-border spinner-border-sm text-primary me-2" role="status"></div>
+                                            <span><strong>Currently Processing:</strong> <span id="current-member">-</span></span>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="row">
+                                        <div class="col-md-2 text-center">
+                                            <h6 class="text-primary">📋 Total</h6>
+                                            <h4 id="total-count">0</h4>
+                                        </div>
+                                        <div class="col-md-2 text-center">
+                                            <h6 class="text-info">⏳ Processing</h6>
+                                            <h4 id="processing-count">0</h4>
+                                        </div>
+                                        <div class="col-md-2 text-center">
+                                            <h6 class="text-success">✅ Successful</h6>
+                                            <h4 id="success-count">0</h4>
+                                        </div>
+                                        <div class="col-md-2 text-center">
+                                            <h6 class="text-danger">❌ Failed</h6>
+                                            <h4 id="failed-count">0</h4>
+                                        </div>
+                                        <div class="col-md-2 text-center">
+                                            <h6 class="text-warning">⏭️ Skipped</h6>
+                                            <h4 id="skipped-count">0</h4>
+                                        </div>
+                                        <div class="col-md-2 text-center">
+                                            <h6 class="text-info">⏱️ Duration</h6>
+                                            <h4 id="duration">0s</h4>
+                                        </div>
+                                    </div>
+
+                                    <!-- Speed and ETA -->
+                                    <div class="row mt-3">
+                                        <div class="col-md-6 text-center">
+                                            <small class="text-muted">Processing Speed: <span id="processing-speed">0</span> members/min</small>
+                                        </div>
+                                        <div class="col-md-6 text-center">
+                                            <small class="text-muted">Estimated Time Remaining: <span id="eta">-</span></small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Results Section -->
+                    <div class="card mt-4" id="results-section" style="display: none;">
+                        <div class="card-header">
+                            <h5 class="mb-0">📋 Sync Results</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <h6 class="text-success">✅ Successfully Synced</h6>
+                                    <div id="success-list" class="list-group" style="max-height: 400px; overflow-y: auto;">
+                                        <!-- Success items will be added here -->
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <h6 class="text-danger">❌ Failed to Sync</h6>
+                                    <div id="failed-list" class="list-group" style="max-height: 400px; overflow-y: auto;">
+                                        <!-- Failed items will be added here -->
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <h6 class="text-warning">⏭️ Skipped Members</h6>
+                                    <div id="skipped-list" class="list-group" style="max-height: 400px; overflow-y: auto;">
+                                        <!-- Skipped items will be added here -->
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<script>
+// Get CSRF token properly
+function getCSRFToken() {
+    const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]')?.value || 
+                     document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') ||
+                     $('[name=csrfmiddlewaretoken]').val();
+    
+    if (!csrfToken) {
+        console.error('CSRF token not found!');
+        return '';
+    }
+    return csrfToken;
+}
+
+// Global variables for tracking sync progress
+let syncStartTime = null;
+let syncInterval = null;
+let statusInterval = null;
+let syncStopped = false;
+
+function addStatusLog(message, type = 'info') {
+    const timestamp = new Date().toLocaleTimeString();
+    const typeClass = {
+        'info': 'text-info',
+        'success': 'text-success',
+        'error': 'text-danger',
+        'warning': 'text-warning',
+        'processing': 'text-primary'
+    }[type] || 'text-muted';
+    
+    const logEntry = `
+        <div class="status-entry ${typeClass} mb-1">
+            <span class="text-muted">[${timestamp}]</span> ${message}
+        </div>
+    `;
+    
+    $('#status-log').append(logEntry);
+    
+    // Auto-scroll to bottom
+    const logContainer = $('#status-log').parent();
+    logContainer.scrollTop(logContainer[0].scrollHeight);
+    
+    // Show log card if hidden
+    $('#status-log-card').show();
+}
+
+function clearStatusLog() {
+    $('#status-log').empty();
+    $('#status-log-card').hide();
+}
+
+function updateProgressStats(data) {
+    $('#total-count').text(data.total || 0);
+    $('#processing-count').text(data.processing || 0);
+    $('#success-count').text(data.successful || 0);
+    $('#failed-count').text(data.failed || 0);
+    $('#skipped-count').text(data.skipped || 0);
+    
+    // Update progress bar
+    const total = data.total || 1;
+    const completed = (data.successful || 0) + (data.failed || 0) + (data.skipped || 0);
+    const percentage = Math.round((completed / total) * 100);
+    
+    $('#sync-progress').css('width', percentage + '%');
+    $('#progress-text').text(`${completed}/${total} (${percentage}%)`);
+    
+    // Update current member if provided
+    if (data.current_member) {
+        $('#current-member').text(data.current_member);
+        $('#current-processing').show();
+    }
+    
+    // Calculate processing speed and ETA
+    if (syncStartTime && completed > 0) {
+        const elapsed = (Date.now() - syncStartTime) / 1000;
+        const speed = Math.round((completed / elapsed) * 60); // members per minute
+        $('#processing-speed').text(speed);
+        
+        const remaining = total - completed;
+        if (speed > 0 && remaining > 0) {
+            const etaMinutes = Math.round(remaining / (speed / 60));
+            $('#eta').text(etaMinutes > 1 ? `${etaMinutes} min` : '< 1 min');
+        } else {
+            $('#eta').text('-');
+        }
+    }
+}
+
+function startBulkSync() {
+    if (!confirm('Are you sure you want to sync all active members to the device? This may take several minutes.')) {
+        return;
+    }
+
+    // Reset sync state
+    syncStopped = false;
+    syncStartTime = Date.now();
+    
+    // Show progress section and update UI
+    $('#progress-section').show();
+    $('#results-section').hide();
+    $('#start-sync-btn').prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Syncing...');
+    $('#stop-sync-btn').show();
+    $('#warning-alert').show();
+    
+    // Clear previous status
+    clearStatusLog();
+    addStatusLog('🚀 Starting bulk sync process...', 'info');
+    
+    // Reset progress
+    updateProgressStats({total: 0, processing: 0, successful: 0, failed: 0, skipped: 0});
+    $('#duration').text('0s');
+    $('#current-processing').hide();
+    
+    // Start duration timer
+    syncInterval = setInterval(() => {
+        if (syncStartTime) {
+            const elapsed = Math.floor((Date.now() - syncStartTime) / 1000);
+            $('#duration').text(elapsed + 's');
+        }
+    }, 1000);
+
+    // Start status polling
+    statusInterval = setInterval(pollSyncStatus, 2000);
+    
+    // Make initial AJAX request to start sync - FIXED URL
+    $.ajax({
+        url: 'bulk-sync-execute/',  // Fixed: removed 'members/'
+        type: 'POST',
+        headers: {
+            'X-CSRFToken': getCSRFToken()  // Fixed: use proper CSRF token function
+        },
+        timeout: 300000, // 5 minutes timeout
+        success: function(response) {
+            handleSyncComplete(response);
+        },
+        error: function(xhr, status, error) {
+            handleSyncError(xhr, status, error);
+        }
+    });
+}
+
+function pollSyncStatus() {
+    if (syncStopped) return;
+    
+    $.ajax({
+        url: 'bulk-sync-status/',  // Fixed: removed 'members/'
+        type: 'GET',
+        success: function(response) {
+            if (response.status === 'in_progress') {
+                updateProgressStats(response.data);
+                
+                // Add status updates to log
+                if (response.recent_updates) {
+                    response.recent_updates.forEach(update => {
+                        addStatusLog(update.message, update.type);
+                    });
+                }
+            } else if (response.status === 'completed') {
+                // Sync completed, stop polling
+                clearInterval(statusInterval);
+            }
+        },
+        error: function() {
+            // Silently handle polling errors
+        }
+    });
+}
+
+function stopBulkSync() {
+    if (confirm('Are you sure you want to stop the bulk sync process?')) {
+        syncStopped = true;
+        
+        $.ajax({
+            url: 'bulk-sync-stop/',  // Fixed: removed 'members/'
+            type: 'POST',
+            headers: {
+                'X-CSRFToken': getCSRFToken()  // Fixed: use proper CSRF token function
+            },
+            success: function(response) {
+                addStatusLog('🛑 Sync stopped by user', 'warning');
+                resetSyncUI();
+            }
+        });
+    }
+}
+
+function handleSyncComplete(response) {
+    clearInterval(syncInterval);
+    clearInterval(statusInterval);
+    
+    if (response.status === 'completed') {
+        // Update final progress
+        $('#sync-progress').css('width', '100%').removeClass('progress-bar-animated');
+        $('#progress-text').text('Sync Completed!');
+        $('#current-processing').hide();
+        
+        // Update final counters
+        updateProgressStats(response.summary);
+        
+        const elapsed = Math.floor((Date.now() - syncStartTime) / 1000);
+        $('#duration').text(elapsed + 's');
+        
+        // Add completion log
+        addStatusLog(`✅ Bulk sync completed! Success: ${response.summary.successful}, Failed: ${response.summary.failed}, Skipped: ${response.summary.skipped}`, 'success');
+        
+        // Show results
+        showResults(response.details);
+        $('#results-section').show();
+        
+        // Show success message
+        if (response.summary.successful > 0) {
+            showAlert('success', `🎉 Bulk sync completed successfully! ${response.summary.successful} members synced.`);
+        } else {
+            showAlert('warning', '⚠️ Bulk sync completed but no members were successfully synced.');
+        }
+        
+        // Refresh stats
+        refreshStats();
+    } else {
+        addStatusLog(`❌ Sync failed: ${response.message}`, 'error');
+        showAlert('danger', `❌ Sync failed: ${response.message}`);
+    }
+    
+    resetSyncUI();
+}
+
+function handleSyncError(xhr, status, error) {
+    clearInterval(syncInterval);
+    clearInterval(statusInterval);
+    
+    let errorMessage = error;
+    if (xhr.status === 404) {
+        errorMessage = 'URL not found (404). Please check your URL configuration.';
+    } else if (xhr.status === 403) {
+        errorMessage = 'Permission denied (403). Please check CSRF token.';
+    }
+    
+    addStatusLog(`❌ AJAX Error: ${errorMessage}`, 'error');
+    showAlert('danger', `❌ AJAX Error: ${errorMessage}. Please check your network connection and try again.`);
+    
+    resetSyncUI();
+}
+
+function resetSyncUI() {
+    $('#start-sync-btn').prop('disabled', false).html('<i class="fas fa-sync-alt"></i> Start Bulk Sync');
+    $('#stop-sync-btn').hide();
+}
+
+function showResults(details) {
+    // Clear previous results
+    $('#success-list, #failed-list, #skipped-list').empty();
+    
+    // Check if details exist
+    if (!details) {
+        console.error('No details provided for results');
+        return;
+    }
+    
+    // Show successful syncs
+    if (details.successful_members) {
+        details.successful_members.forEach(member => {
+            $('#success-list').append(`
+                <div class="list-group-item list-group-item-success border-success mb-2">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <strong>${member.member_name}</strong>
+                            <small class="text-muted d-block">ID: ${member.member_id}</small>
+                        </div>
+                        <small class="text-success">Valid until: ${member.subscription_end}</small>
+                    </div>
+                </div>
+            `);
+        });
+    }
+    
+    // Show failed syncs
+    if (details.failed_members) {
+        details.failed_members.forEach(member => {
+            $('#failed-list').append(`
+                <div class="list-group-item list-group-item-danger border-danger mb-2">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <strong>${member.member_name}</strong>
+                            <small class="text-muted d-block">ID: ${member.member_id}</small>
+                        </div>
+                    </div>
+                    <small class="text-danger mt-1 d-block">Error: ${member.error}</small>
+                </div>
+            `);
+        });
+    }
+    
+    // Show skipped members
+    if (details.skipped_members) {
+        details.skipped_members.forEach(member => {
+            $('#skipped-list').append(`
+                <div class="list-group-item list-group-item-warning border-warning mb-2">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <strong>${member.member_name}</strong>
+                            <small class="text-muted d-block">ID: ${member.member_id}</small>
+                        </div>
+                    </div>
+                    <small class="text-warning mt-1 d-block">Reason: ${member.reason}</small>
+                </div>
+            `);
+        });
+    }
+}
+
+function testDeviceConnection() {
+    addStatusLog('🔍 Testing device connection...', 'info');
+    showAlert('info', '🔍 Testing device connection...');
+    
+    $.ajax({
+        url: 'test-device-connection/',  // Fixed: removed 'members/'
+        type: 'GET',
+        timeout: 10000,
+        success: function(response) {
+            if (response.status === 'success') {
+                addStatusLog('✅ Device connection successful!', 'success');
+                showAlert('success', '✅ Device connection successful!');
+            } else {
+                addStatusLog(`⚠️ Device connection test failed: ${response.message}`, 'warning');
+                showAlert('warning', '⚠️ Device connection test failed: ' + response.message);
+            }
+        },
+        error: function(xhr, status, error) {
+            let errorMessage = error;
+            if (xhr.status === 404) {
+                errorMessage = 'Test endpoint not found (404)';
+            }
+            addStatusLog(`❌ Device connection failed: ${errorMessage}`, 'error');
+            showAlert('danger', `❌ Device connection failed: ${errorMessage}`);
+        }
+    });
+}
+
+function refreshStats() {
+    location.reload();
+}
+
+function showAlert(type, message) {
+    // Create alert element
+    const alertHTML = `
+        <div class="alert alert-${type} alert-dismissible fade show custom-alert" role="alert">
+            ${message}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    `;
+    
+    // Remove existing custom alerts
+    $('.custom-alert').remove();
+    
+    // Add new alert at the top of the card body
+    $('.card-body').first().prepend(alertHTML);
+    
+    // Auto-dismiss after 5 seconds
+    setTimeout(() => {
+        $('.custom-alert').fadeOut(500, function() {
+            $(this).remove();
+        });
+    }, 5000);
+}
+
+// Initialize page
+$(document).ready(function() {
+    console.log('Enhanced Bulk Sync page loaded');
+    
+    // Check CSRF token availability
+    const token = getCSRFToken();
+    if (!token) {
+        console.warn('CSRF token not found - AJAX requests may fail');
+        showAlert('warning', '⚠️ CSRF token not found. Please refresh the page.');
+    }
+    
+    // Check if there are any Django messages to display
+    {% if messages %}
+        {% for message in messages %}
+            showAlert('{{ message.tags }}', '{{ message|escapejs }}');
+        {% endfor %}
+    {% endif %}
+});
+</script>
+
+<style>
+.progress {
+    height: 30px;
+    border-radius: 15px;
+}
+
+.progress-bar {
+    font-size: 14px;
+    line-height: 30px;
+    border-radius: 15px;
+}
+
+.list-group-item {
+    margin-bottom: 8px;
+    border-radius: 8px;
+    border-width: 2px;
+}
+
+.card {
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    border-radius: 12px;
+}
+
+#status-log {
+    background-color: #f8f9fa;
+    padding: 15px;
+    border-radius: 8px;
+    border: 1px solid #dee2e6;
+}
+
+.status-entry {
+    line-height: 1.4;
+    padding: 2px 0;
+}
+
+#current-processing {
+    background: linear-gradient(90deg, #f8f9fa 0%, #e9ecef 50%, #f8f9fa 100%);
+    animation: shimmer 2s infinite;
+}
+
+@keyframes shimmer {
+    0% { background-position: -200px 0; }
+    100% { background-position: calc(200px + 100%) 0; }
+}
+
+.spinner-border-sm {
+    width: 1rem;
+    height: 1rem;
+}
+
+.icon {
+    width: 56px;
+    height: 56px;
+}
+
+.numbers h5 {
+    font-size: 1.75rem;
+}
+
+/* Custom alert styles to avoid conflicts */
+.custom-alert {
+    position: relative;
+    z-index: 1050;
+}
+</style>
+{% endblock %}

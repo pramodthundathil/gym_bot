@@ -84,17 +84,43 @@ def Home(request):
 
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
+from django.core.cache import cache
+from datetime import datetime, date
+
 
 @csrf_exempt
 def trigger_scheduled_task(request):
     if request.method == 'POST':
         try:
-            ScheduledTask()  # Call your function here
-            return JsonResponse({'status': 'success', 'message': 'Task executed successfully'})
+            # Get today's date as a string
+            today = date.today().strftime('%Y-%m-%d')
+            cache_key = f'scheduled_task_run_{today}'
+            
+            # Check if task has already run today
+            if cache.get(cache_key):
+                return JsonResponse({
+                    'status': 'info', 
+                    'message': 'Task already executed today'
+                })
+            
+            # Run the task
+            result = ScheduledTask()  # Your function
+            
+            # Mark task as completed for today (cache for 24 hours)
+            cache.set(cache_key, True, 60 * 60 * 24)  # 24 hours
+            
+            return JsonResponse({
+                'status': 'success', 
+                'message': 'Task executed successfully',
+                'result': result if result else 'Task completed'
+            })
+            
         except Exception as e:
             return JsonResponse({'status': 'error', 'message': str(e)})
     else:
         return JsonResponse({'status': 'error', 'message': 'Invalid request method'})
+
+
 
 
 

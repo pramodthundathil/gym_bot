@@ -50,6 +50,16 @@ urlpatterns = [
     path("make_balance_payment/<int:pk>",views.make_balance_payment,name="make_balance_payment"),
     path("get_balance_receipt/<int:pk>",views.get_balance_receipt,name="get_balance_receipt"),
     path("api_call",views.api_call,name="api_call"),
+
+   # Bulk Sync URLs
+    path('bulk-sync/', views.bulk_sync_page, name='bulk_sync_page'),
+    path('bulk-sync/bulk-sync-execute/', views.bulk_sync_execute, name='bulk_sync_execute'),
+    path('bulk-sync/bulk-sync-status/', views.bulk_sync_status, name='bulk_sync_status'),
+    path('bulk-sync/bulk-sync-results/', views.bulk_sync_results, name='bulk_sync_results'),
+    path('bulk-sync/bulk-sync-stop/', views.bulk_sync_stop, name='bulk_sync_stop'),
+    path('bulk-sync/bulk-sync-status-page/', views.bulk_sync_status_page, name='bulk_sync_status_page'),
+    path('bulk-sync/test-device-connection/', views.test_device_connection, name='test_device_connection'),
+  
     
 
     
