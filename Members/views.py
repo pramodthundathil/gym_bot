@@ -38,11 +38,13 @@ def disable_person_from_device(member_id, device_serial_number="CQUH233560091"):
     url = "http://192.168.70.31:8050/api_disableperson"
     
     headers = {
+        'Host': 'emmyfitness-betainfotech.pythonanywhere.com',
+        'Content-Type': 'application/json',
+        'Content-Length': '0',  # Set to '0' for GET requests, calculate for POST/PUT requests
         'Accept': '*/*',
         'Accept-Encoding': 'gzip, deflate, br',
         'Connection': 'keep-alive',
-        'token': '7ee4e345d834feb:c3abbf46c8714cb',
-        'Content-Type': 'application/json'
+        'token': '7ee4e345d834feb:c3abbf46c8714cb'
     }
     
     payload = {
@@ -395,11 +397,13 @@ def add_person_to_device(member, subscription, device_serial_number="CQUH2335600
     url = "http://192.168.70.31:8050/api_updateperson"
     
     headers = {
+        'Host': 'emmyfitness-betainfotech.pythonanywhere.com',
+        'Content-Type': 'application/json',
+        'Content-Length': '0',  # Set to '0' for GET requests, calculate for POST/PUT requests
         'Accept': '*/*',
         'Accept-Encoding': 'gzip, deflate, br',
         'Connection': 'keep-alive',
-        'token': '7ee4e345d834feb:c3abbf46c8714cb',
-        'Content-Type': 'application/json'
+        'token': '7ee4e345d834feb:c3abbf46c8714cb'
     }
     
     # Format dates for the device API
@@ -2019,15 +2023,17 @@ def add_person_to_device_bulk(member, subscription, device_serial_number="CQUH23
     
     url = "http://192.168.70.31:8050/api_updateperson"
     
+    
     headers = {
-        'Host': 'localhost:9062',
-        'User-Agent': 'PostmanRuntime/7.29.2',
+        'Host': 'emmyfitness-betainfotech.pythonanywhere.com',
+        'Content-Type': 'application/json',
+        'Content-Length': '0',  # Set to '0' for GET requests, calculate for POST/PUT requests
         'Accept': '*/*',
         'Accept-Encoding': 'gzip, deflate, br',
         'Connection': 'keep-alive',
-        'token': '7ee4e345d834feb:c3abbf46c8714cb',
-        'Content-Type': 'application/json'
+        'token': '7ee4e345d834feb:c3abbf46c8714cb'
     }
+    
     
     # Format dates for the device API
     start_date = subscription.Subscribed_Date.strftime('%Y-%m-%d')
@@ -2425,11 +2431,13 @@ def test_device_connection(request):
     
     url = "http://192.168.70.31:8050/api_updateperson"
     headers = {
-        'Host': 'localhost:9062',
-        'User-Agent': 'PostmanRuntime/7.29.2',
+        'Host': 'emmyfitness-betainfotech.pythonanywhere.com',
+        'Content-Type': 'application/json',
+        'Content-Length': '0',  # Set to '0' for GET requests, calculate for POST/PUT requests
         'Accept': '*/*',
-        'token': '7ee4e345d834feb:c3abbf46c8714cb',
-        'Content-Type': 'application/json'
+        'Accept-Encoding': 'gzip, deflate, br',
+        'Connection': 'keep-alive',
+        'token': '7ee4e345d834feb:c3abbf46c8714cb'
     }
     
     # Send a minimal test request
