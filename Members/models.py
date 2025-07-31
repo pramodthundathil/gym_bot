@@ -61,8 +61,12 @@ class MemberData(models.Model):
         self.save()
 
     def __str__(self):
-        return self.First_Name +" "+self.Last_Name
-
+        if self.Last_Name == None:
+            last_name = " "
+        else: 
+            last_name = self.Last_Name
+        return self.First_Name +" "+ str(last_name) + " User-id: " + str(self.id)
+ 
 class Subscription(models.Model):
     Member = models.ForeignKey(MemberData, on_delete=models.CASCADE,null=True, blank=True, related_name="Member_subscription")
     Type_Of_Subscription = models.ForeignKey(TypeSubsription,on_delete=models.SET_NULL,null=True,blank=True)

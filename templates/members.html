@@ -83,7 +83,7 @@
                         <img src="{{sub.Member.Photo.url}}" alt="image" id="photoclient" />
                         <b>{{forloop.counter}}. </b>
                         <div class="table-user-name ml-3">
-                          <p class="mb-0 font-weight-medium"> {{sub.Member.First_Name}} {{sub.Member.Last_Name}} </p>
+                          <p class="mb-0 font-weight-medium"> {{sub.Member.First_Name}} {{sub.Member.Last_Name}} - User Id: {{sub.Member.id}}</p>
                           {% if sub.Payment_Status == False %}
                           <small class="text-danger"> Payment Not Completed</small>
                           {% else %}

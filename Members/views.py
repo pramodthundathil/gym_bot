@@ -44,7 +44,7 @@ def disable_person_from_device(member_id, device_serial_number="CQUH233560091"):
         'Accept': '*/*',
         'Accept-Encoding': 'gzip, deflate, br',
         'Connection': 'keep-alive',
-        'token': '7ee4e345d834feb:c3abbf46c8714cb'
+        'Token': '7ee4e345d834feb:c3abbf46c8714cb'
     }
     
     payload = {
@@ -403,7 +403,7 @@ def add_person_to_device(member, subscription, device_serial_number="CQUH2335600
         'Accept': '*/*',
         'Accept-Encoding': 'gzip, deflate, br',
         'Connection': 'keep-alive',
-        'token': '7ee4e345d834feb:c3abbf46c8714cb'
+        'Token': '7ee4e345d834feb:c3abbf46c8714cb'
     }
     
     # Format dates for the device API
@@ -2031,7 +2031,7 @@ def add_person_to_device_bulk(member, subscription, device_serial_number="CQUH23
         'Accept': '*/*',
         'Accept-Encoding': 'gzip, deflate, br',
         'Connection': 'keep-alive',
-        'token': '7ee4e345d834feb:c3abbf46c8714cb'
+        'Token': '7ee4e345d834feb:c3abbf46c8714cb'
     }
     
     
@@ -2437,7 +2437,7 @@ def test_device_connection(request):
         'Accept': '*/*',
         'Accept-Encoding': 'gzip, deflate, br',
         'Connection': 'keep-alive',
-        'token': '7ee4e345d834feb:c3abbf46c8714cb'
+        'Token': '7ee4e345d834feb:c3abbf46c8714cb'
     }
     
     # Send a minimal test request

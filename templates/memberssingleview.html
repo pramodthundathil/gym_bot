@@ -33,7 +33,7 @@
       <div class="col-xl-6 col-sm-6 grid-margin stretch-card" style="height: auto !important;">
         <div class="card" style="height: 500px;">
           <div class="card-body">
-            <div class="card-title font-weight-medium"> {{member.First_Name}} {{member.Last_Name}} </div>
+            <div class="card-title font-weight-medium"> {{member.First_Name}} {{member.Last_Name}} <span style="font-size: larger;">User Id: - {{member.id}}</span> </div>
             <p class="text-muted"> Member Since: <span class="badge badge-info">{{member.Registration_Date}}</span> </p>
             <div class="d-flex flex-wrap border-bottom py-2 border-top justify-content-between">
               <img class="survey-img mb-lg-3" src="{{member.Photo.url}}" alt=""
