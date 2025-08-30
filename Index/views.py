@@ -467,11 +467,19 @@ def member_single_update( pk):
 def member_single(request, pk):
         
         member = MemberData.objects.get(id = pk)
-        access = AccessToGate.objects.get(Member = member)
-        sub = Subscription.objects.get(Member = member)
+        try:
+            access = AccessToGate.objects.get(Member = member)
+            access_status = access.Status
+        except:
+            access_status = False
+
+        try:
+            sub = Subscription.objects.get(Member = member)
+        except:
+            sub = {}
 
 
-        add_person_to_device(member, sub, access.Status)
+        add_person_to_device(member, sub, access_status)
         print("updated successfully")
 
         return redirect("test_connection_local")
