@@ -47,7 +47,7 @@ def disable_person_from_device(member_id, device_serial_number="CQUH233560091"):
     #     'Token': '7ee4e345d834feb:c3abbf46c8714cb'
     # }
 
-    url = "http://127.0.0.1:8000/disable_person/"
+    url = "https://django.byteboot.in/disable_person/"
 
     
     payload = {
@@ -488,7 +488,7 @@ def add_person_to_device(member, subscription,access, device_serial_number="CQUH
 
     print(payload)
 
-    url = "http://127.0.0.1:8000/update_person_to_db_device/"
+    url = "https://django.byteboot.in/update_person_to_db_device/"
     try:
         response = requests.post(url, data=json.dumps(payload))
         response.raise_for_status()  # raises error for bad status
