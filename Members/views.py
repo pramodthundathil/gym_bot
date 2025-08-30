@@ -583,7 +583,7 @@ def Member(request):
                 access_gate.save()
                 
                 # Add member to device
-                device_success, device_message = add_person_to_device(member, sub_data)
+                device_success, device_message = add_person_to_device(member, sub_data,access_gate.Status)
                 
                 if device_success:
                     # Update member's access status
@@ -677,7 +677,7 @@ def MemberAdvanced(request):
                 )
                 
                 # Try to add member to device
-                device_success, device_message = add_person_to_device(member, sub_data)
+                device_success, device_message = add_person_to_device(member, sub_data, access_gate.Status)
                 
                 if device_success:
                     # Device sync successful
@@ -764,7 +764,7 @@ def sync_member_to_device(member_id):
         if not subscription:
             return False, "No active subscription found for this member"
         
-        success, message = add_person_to_device(member, subscription)
+        success, message = add_person_to_device(member, subscription, member.Access_status)
         
         if success:
             member.Access_status = True
@@ -1121,7 +1121,7 @@ def PostNewPayment(request,pk):
         if AccessToGate.objects.filter(Validity_Date__gte = today, Member = member ).exists():
             access.Status = True 
             access.Payment_status = True
-            add_person_to_device(member,sub)
+            add_person_to_device(member,sub, access.Status)
 
         else:
             access.Status = False 
@@ -1188,7 +1188,7 @@ def AddPaymentFromMemberTab(request,pk):
         if AccessToGate.objects.filter(Validity_Date__gte = today, Member = payment.Member ).exists():
             access.Status = True 
             access.Payment_status = True 
-            add_person_to_device(member,sub)
+            add_person_to_device(member,sub,access.Status)
 
         else:
             access.Status = False 
@@ -1438,7 +1438,7 @@ def ExtendAccessToGate(request,pk):
         access.save()
         subscrib.Subscription_End_Date = extention
         subscrib.save()
-        add_person_to_device(member,subscrib)
+        add_person_to_device(member,subscrib, access.Status)
         messages.success(request, "Access Grandad Till {}".format(extention))
         return redirect(MembersSingleView, pk)
     context = {
