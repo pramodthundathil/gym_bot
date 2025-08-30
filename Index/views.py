@@ -457,7 +457,7 @@ def member_single_update( pk):
             sub = {}
 
 
-        response  = add_person_to_device_test(member, sub, access_status)
+        response  = add_person_to_device(member, sub, access_status)
         print("updated successfully")
 
         return response
@@ -471,7 +471,7 @@ def member_single(request, pk):
         sub = Subscription.objects.get(Member = member)
 
 
-        add_person_to_device(member, sub, access)
+        add_person_to_device(member, sub, access.Status)
         print("updated successfully")
 
         return redirect("test_connection_local")
