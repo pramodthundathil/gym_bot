@@ -98,7 +98,7 @@ class BalancePayment(models.Model):
     Payment_Date = models.DateField(auto_now_add=True) 
 
 class AccessToGate(models.Model):
-    Member = models.ForeignKey(MemberData, on_delete=models.CASCADE)
+    Member = models.ForeignKey(MemberData, on_delete=models.CASCADE, related_name="access_to_member")
     Subscription = models.ForeignKey(Subscription, on_delete=models.SET_NULL, null=True, blank=True)
     Validity_Date = models.DateField(auto_now_add=False)
     Status = models.BooleanField(default=False)

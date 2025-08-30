@@ -25,6 +25,8 @@ urlpatterns = [
     path('trigger-task/', views.trigger_scheduled_task, name='trigger-task'),
 
 
-
+    path("test_connection_local",views.test_connection_local,name="test_connection_local"),
+    path("member_single/<int:pk>",views.member_single,name="member_single"),
+    path("member_create_bulk",views.member_create_bulk,name="member_create_bulk")
 
 ]

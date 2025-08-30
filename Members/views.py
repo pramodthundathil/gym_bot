@@ -35,17 +35,20 @@ def disable_person_from_device(member_id, device_serial_number="CQUH233560091"):
     """
     Disable a person from the access control device
     """
-    url = "http://192.168.70.31:8050/api_disableperson"
+    # url = "http://192.168.70.31:8050/api_disableperson"
     
-    headers = {
-        'Host': 'emmyfitness-betainfotech.pythonanywhere.com',
-        'Content-Type': 'application/json',
-        'Content-Length': '0',  # Set to '0' for GET requests, calculate for POST/PUT requests
-        'Accept': '*/*',
-        'Accept-Encoding': 'gzip, deflate, br',
-        'Connection': 'keep-alive',
-        'Token': '7ee4e345d834feb:c3abbf46c8714cb'
-    }
+    # headers = {
+    #     'Host': 'emmyfitness-betainfotech.pythonanywhere.com',
+    #     'Content-Type': 'application/json',
+    #     'Content-Length': '0',  # Set to '0' for GET requests, calculate for POST/PUT requests
+    #     'Accept': '*/*',
+    #     'Accept-Encoding': 'gzip, deflate, br',
+    #     'Connection': 'keep-alive',
+    #     'Token': '7ee4e345d834feb:c3abbf46c8714cb'
+    # }
+
+    url = "http://127.0.0.1:8000/disable_person/"
+
     
     payload = {
         "BadgeNumber": str(member_id),
@@ -53,7 +56,7 @@ def disable_person_from_device(member_id, device_serial_number="CQUH233560091"):
     }
     
     try:
-        response = requests.post(url, headers=headers, json=payload, timeout=10)
+        response = requests.post(url, json=payload, timeout=10)
         
         if response.status_code == 200:
             print(f"Successfully disabled member {member_id} from device {device_serial_number}")
@@ -106,6 +109,14 @@ def ScheduledTask():
     device_disable_fail_count = 0
     
     for member_info in members_to_disable_from_device:
+        # response = requests.get('http://127.0.0.1:8000/call_connection/')
+        # if response.status_code == 200:
+        #     print(f"Successfully disabled member")
+            
+        # else:
+        #     print(f"Failed to disable member ")
+            
+        
         success = disable_person_from_device(member_info['member_id'])
         if success:
             device_disable_success_count += 1
@@ -390,7 +401,7 @@ from django.contrib import messages
 from django.shortcuts import redirect, render
 from django.contrib.auth.decorators import login_required
 
-def add_person_to_device(member, subscription, device_serial_number="CQUH233560091"):
+def add_person_to_device_test(member, subscription, device_serial_number="CQUH233560091"):
     """
     Add a person to the access control device
     """
@@ -427,8 +438,10 @@ def add_person_to_device(member, subscription, device_serial_number="CQUH2335600
         "EndDate": end_date,
         "AuthorizeddoorId": "1",  # Default door ID
         "TimeZone": "1",  # Default timezone
-        "DeviceSerialNumber": device_serial_number
+        "DeviceSerialNumber": device_serial_number,
+        
     }
+    
     
     try:
         response = requests.post(url, headers=headers, json=payload, timeout=10)
@@ -445,6 +458,45 @@ def add_person_to_device(member, subscription, device_serial_number="CQUH2335600
         error_msg = f"Error adding member to device: {str(e)}"
         print(error_msg)
         return False, error_msg
+
+def add_person_to_device(member, subscription,access, device_serial_number="CQUH233560091"):
+    
+    try:
+        start_date = subscription.Subscribed_Date.strftime('%Y-%m-%d')
+        end_date = subscription.Subscription_End_Date.strftime('%Y-%m-%d')
+    except:
+        start_date = '2025-01-10'
+        end_date = '2025-10-20'
+    
+    # Generate a simple card number if not exists (you might want to add this field to your model)
+    card_number = f"{member.id:08d}"  # Pad member ID to 8 digits
+    
+    payload = {
+        "BadgeNumber": str(member.id),
+        "Name": f"{member.First_Name} {member.Last_Name}",
+        "Card": card_number,
+        "Password": str(member.id)[-4:].zfill(4),  # Use last 4 digits of ID as password
+        "Privilege": "14",  # Default privilege level
+        "StartDate": start_date,
+        "EndDate": end_date,
+        "AuthorizeddoorId": "1",  # Default door ID
+        "TimeZone": "1",  # Default timezone
+        "DeviceSerialNumber": device_serial_number,
+        'access_gate':access
+    }
+    
+
+    print(payload)
+
+    url = "http://127.0.0.1:8000/update_person_to_db_device/"
+    try:
+        response = requests.post(url, data=json.dumps(payload))
+        response.raise_for_status()  # raises error for bad status
+        return response.json()  # if response is JSON
+    except requests.exceptions.RequestException as e:
+        return {"error": str(e)}
+    
+  
 
 
 # def disable_person_from_device(member_id, device_serial_number="CQUH233560091"):

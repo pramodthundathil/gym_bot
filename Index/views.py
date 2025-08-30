@@ -416,3 +416,65 @@ def Supports(request):
         return redirect("Supports")
 
     return render(request,"support.html")
+
+
+
+
+from Members.views import add_person_to_device
+
+
+
+def test_connection_local(request):
+    members = MemberData.objects.all()
+
+    context = {
+        "members":members
+    }
+    return render(request,"test_connection/index.html",context)
+
+
+
+def member_create_bulk(request):
+    members = MemberData.objects.all()
+    for member in members:
+        member_single_update( member.id)
+    
+    return redirect("test_connection_local")
+
+
+def member_single_update( pk):
+        
+        member = MemberData.objects.get(id = pk)
+        try:
+            access = AccessToGate.objects.get(Member = member)
+            access_status = access.Status
+        except:
+            access_status = False
+
+        try:
+            sub = Subscription.objects.get(Member = member)
+        except:
+            sub = {}
+
+
+        response  = add_person_to_device_test(member, sub, access_status)
+        print("updated successfully")
+
+        return response
+        
+
+
+def member_single(request, pk):
+        
+        member = MemberData.objects.get(id = pk)
+        access = AccessToGate.objects.get(Member = member)
+        sub = Subscription.objects.get(Member = member)
+
+
+        add_person_to_device(member, sub, access)
+        print("updated successfully")
+
+        return redirect("test_connection_local")
+
+
+
