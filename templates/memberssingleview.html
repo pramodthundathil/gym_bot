@@ -33,7 +33,8 @@
       <div class="col-xl-6 col-sm-6 grid-margin stretch-card" style="height: auto !important;">
         <div class="card" style="height: 500px;">
           <div class="card-body">
-            <div class="card-title font-weight-medium"> {{member.First_Name}} {{member.Last_Name}} <span style="font-size: larger;">User Id: - {{member.id}}</span> </div>
+            <div class="card-title font-weight-medium"> {{member.First_Name}} {{member.Last_Name}} <span
+                style="font-size: larger;">User Id: - {{member.id}}</span> </div>
             <p class="text-muted"> Member Since: <span class="badge badge-info">{{member.Registration_Date}}</span> </p>
             <div class="d-flex flex-wrap border-bottom py-2 border-top justify-content-between">
               <img class="survey-img mb-lg-3" src="{{member.Photo.url}}" alt=""
@@ -75,12 +76,12 @@
               {% if member.Id_Upload %}
               <img class="survey-img mb-lg-3" src="{{member.Id_Upload.url}}" alt=""
                 style="width:60%;height:200px;display:block;margin:auto;object-fit:contain" />
-             
+
 
               {% else %}
               <div class="survey-img mb-lg-3" src="" alt=""
-              style="width:60%;height:200px;display:block;margin:auto;object-fit:contain">No ID Available</div>
-              
+                style="width:60%;height:200px;display:block;margin:auto;object-fit:contain">No ID Available</div>
+
               {% endif %}
             </div>
             <div class="d-flex flex-wrap border-bottom py-2 justify-content-center text-center">
@@ -144,8 +145,8 @@
                         </div>
                         <div class="form-group">
                           <label for="exampleInputPassword1">Date Of Birth</label>
-                          <input type="date" value="{{ member.Date_Of_Birth|date:'Y-m-d' }}" name="dob"  class="form-control"
-                            id="exampleInputPassword1" placeholder="Date Of Birth" />
+                          <input type="date" value="{{ member.Date_Of_Birth|date:'Y-m-d' }}" name="dob"
+                            class="form-control" id="exampleInputPassword1" placeholder="Date Of Birth" />
                         </div>
 
                         <div class="form-group">
@@ -192,7 +193,7 @@
                           class="form-control border-warning" id="exampleInputConfirmPassword1" placeholder="Token" />
                       </div> -->
                       <!-- <button data-bs-toggle="modal" data-bs-target="#staticBackdrop2" class="btn btn-warning mr-2"> -->
-                        <!-- Change </button> -->
+                      <!-- Change </button> -->
                       <!-- access change model -->
 
                       <!-- Button trigger modal -->
@@ -389,7 +390,8 @@
                                                   <a href="{%url 'ReceiptGenerate' i.id %}" target="_blank"
                                                     class="btn btn-outline-warning">Get Receipt</a>
 
-                                                  <a href="{%url 'DeletePayment' i.id %}" onclick="return confirm('Are you want to delete ?')" title="delete"
+                                                  <a href="{%url 'DeletePayment' i.id %}"
+                                                    onclick="return confirm('Are you want to delete ?')" title="delete"
                                                     class="btn btn-outline-danger btn-sm"><i class="mdi mdi-delete"
                                                       style="font-size: 15px;"></i></a>
                                                   {% if request.user.groups.all.0.name == "admin" %}
@@ -445,7 +447,7 @@
                                                 </div>
                                               </div>
                                             </div> -->
-                          
+
                                               {% endfor %}
 
                                             </tbody>
@@ -468,10 +470,14 @@
                           </div>
                         </div>
                         <br><br>
-                        <a href="{%url 'ExtendAccessToGate' member.id %}" class="btn btn-outline-warning">Extend
-                          Access</a>
-                        <a href="{%url 'BlockAccess' member.id %}" class="btn btn-outline-dark">Block Access</a>
 
+
+                        <div class="container" style="display: flex;flex-wrap: wrap; gap: 2px;">
+                          <a href="{%url 'get_person_data' member.id %}" class="btn btn-sm btn-info">Check Device Status </a>
+                          <a href="{%url 'ExtendAccessToGate' member.id %}" class="btn btn-outline-warning">Extend
+                            Access</a>
+                          <a href="{%url 'BlockAccess' member.id %}" class="btn btn-outline-dark">Block Access</a>
+                        </div>
 
                       </form>
                     </div>

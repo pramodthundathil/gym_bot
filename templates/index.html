@@ -745,6 +745,182 @@
   <!-- End custom js for this page -->
 
   <!-- datatable jqu -->
+   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+{% if messages %}
+<script>
+    // Professional Seminary themed alerts
+    const seminaryTheme = `
+    .swal2-popup {
+        background: #FFFFFF !important;
+        border-radius: 8px !important;
+        border: 1px solid var(--border, #E5E7EB) !important;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1), 0 4px 10px rgba(0, 0, 0, 0.05) !important;
+        font-family: 'Inter', 'Segoe UI', system-ui, sans-serif !important;
+        padding: 30px !important;
+    }
+    
+    .swal2-title {
+        color: var(--primary-dark, #1B2845) !important;
+        font-weight: 600 !important;
+        font-size: 20px !important;
+        margin-bottom: 12px !important;
+        line-height: 1.4 !important;
+    }
+    
+    .swal2-html-container {
+        color: var(--text-dark, #1E293B) !important;
+        font-size: 15px !important;
+        line-height: 1.6 !important;
+    }
+    
+    .swal2-icon {
+        border: none !important;
+        margin: 0 auto 20px !important;
+        width: 60px !important;
+        height: 60px !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        border-radius: 50% !important;
+        font-size: 32px !important;
+    }
+    
+    /* Hide default SweetAlert2 icon elements */
+    .swal2-icon .swal2-icon-content,
+    .swal2-icon [class^='swal2-success'],
+    .swal2-icon [class^='swal2-x-mark'],
+    .swal2-icon::before,
+    .swal2-icon::after {
+        display: none !important;
+    }
+    
+    .swal2-icon.swal2-success {
+        background-color: rgba(16, 185, 129, 0.1) !important;
+        border: 2px solid var(--success, #10B981) !important;
+    }
+    
+    .swal2-icon.swal2-success::after {
+        content: '✓' !important;
+        display: block !important;
+        color: var(--success, #10B981) !important;
+        font-size: 36px !important;
+        font-weight: bold !important;
+        line-height: 1 !important;
+    }
+    
+    .swal2-icon.swal2-error {
+        background-color: rgba(239, 68, 68, 0.1) !important;
+        border: 2px solid var(--danger, #EF4444) !important;
+    }
+    
+    .swal2-icon.swal2-error::after {
+        content: '✕' !important;
+        display: block !important;
+        color: var(--danger, #EF4444) !important;
+        font-size: 36px !important;
+        font-weight: bold !important;
+        line-height: 1 !important;
+    }
+    
+    .swal2-icon.swal2-warning {
+        background-color: rgba(245, 158, 11, 0.1) !important;
+        border: 2px solid #F59E0B !important;
+    }
+    
+    .swal2-icon.swal2-warning::after {
+        content: '!' !important;
+        display: block !important;
+        color: #F59E0B !important;
+        font-size: 36px !important;
+        font-weight: bold !important;
+        line-height: 1 !important;
+    }
+    
+    .swal2-icon.swal2-info {
+        background-color: rgba(0, 206, 209, 0.1) !important;
+        border: 2px solid var(--primary, #00CED1) !important;
+    }
+    
+    .swal2-icon.swal2-info::after {
+        content: 'i' !important;
+        display: block !important;
+        color: var(--primary, #00CED1) !important;
+        font-size: 36px !important;
+        font-weight: bold !important;
+        line-height: 1 !important;
+        font-style: normal !important;
+    }
+    
+    .swal2-confirm {
+        background: var(--primary-dark, #1B2845) !important;
+        border: none !important;
+        border-radius: 6px !important;
+        padding: 10px 24px !important;
+        font-weight: 500 !important;
+        font-size: 14px !important;
+        color: white !important;
+        transition: all 0.2s ease !important;
+        box-shadow: 0 2px 4px rgba(27, 40, 69, 0.2) !important;
+    }
+    
+    .swal2-confirm:hover {
+        background: var(--secondary, #64748B) !important;
+        transform: translateY(-1px) !important;
+        box-shadow: 0 4px 8px rgba(27, 40, 69, 0.25) !important;
+    }
+    
+    .swal2-confirm:focus {
+        box-shadow: 0 0 0 3px rgba(0, 206, 209, 0.3) !important;
+    }
+    
+    .swal2-timer-progress-bar {
+        background: var(--primary, #00CED1) !important;
+    }
+    
+    .swal2-container {
+        background: rgba(30, 41, 59, 0.4) !important;
+        backdrop-filter: blur(4px) !important;
+    }
+    
+    /* Disable all animations */
+    .swal2-icon,
+    .swal2-icon *,
+    .swal2-popup * {
+        animation: none !important;
+    }
+    
+    @media (prefers-reduced-motion: reduce) {
+        .swal2-popup {
+            animation: none !important;
+        }
+    }
+    `;
+
+    // Inject custom styles
+    const style = document.createElement('style');
+    style.textContent = seminaryTheme;
+    document.head.appendChild(style);
+
+    '{% for message in messages %}'
+    Swal.fire({
+        icon: "{% if message.tags == 'success' %}success{% elif message.tags == 'error' %}error{% elif message.tags == 'warning' %}warning{% else %}info{% endif %}",
+        title: "{{ message|escapejs }}",
+        showConfirmButton: true,
+        confirmButtonText: 'Understood',
+        timer: 5000,
+        timerProgressBar: true,
+        allowEscapeKey: true,
+        allowOutsideClick: true,
+        showClass: {
+            popup: 'animate__animated animate__fadeIn animate__faster'
+        },
+        hideClass: {
+            popup: 'animate__animated animate__fadeOut animate__faster'
+        }
+    });
+    '{% endfor %}'
+</script>
+{% endif %}
 </body>
 
 </html>

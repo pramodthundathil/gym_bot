@@ -1,0 +1,48 @@
+{% extends 'index.html' %}
+{% block content %}
+<div class="main-panel">
+    <div class="content-wrapper pb-0">
+        <div class="container py-5">
+            <h2 class="mb-4">Existence  Test — User Details</h2>
+            <div class="mt-5 mb-5 d-flex">
+            <a href="{% url 'MembersSingleView' employee_no %}" > <i class="arrow"></i> Back To Member</a>
+</div>
+
+            {% if person %}
+                <table class="table table-bordered">
+                    <tbody>
+                        <tr><th>Employee No</th><td>{{ person.employeeNo }}</td></tr>
+                        <tr><th>Name</th><td>{{ person.name }}</td></tr>
+                        <tr><th>User Type</th><td>{{ person.userType }}</td></tr>
+                        <tr><th>Gender</th><td>{{ person.gender }}</td></tr>
+
+                        <tr><th>Valid Enabled</th><td>{{ person.Valid.enable }}</td></tr>
+                        <tr><th>Begin Time</th><td>{{ person.Valid.beginTime }}</td></tr>
+                        <tr><th>End Time</th><td>{{ person.Valid.endTime }}</td></tr>
+
+                        <tr>
+                            <th>Right Plan</th>
+                            <td>
+                                <ul>
+                                    {% for plan in person.RightPlan %}
+                                        <li>Door: {{ plan.doorNo }} — Template: {{ plan.planTemplateNo }}</li>
+                                    {% empty %}
+                                        <li>No plans available</li>
+                                    {% endfor %}
+                                </ul>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            {% else %}
+                <div class="alert alert-warning">
+                    No user data available.
+                <a href="{% url 'add_person_to_device' employee_no %}" class="btn btn-primary">Add This Person to Device</a>
+
+                </div>
+            {% endif %}
+
+        </div>
+    </div>
+</div>
+{% endblock %}

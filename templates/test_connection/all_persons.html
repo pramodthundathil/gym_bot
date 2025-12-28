@@ -1,0 +1,138 @@
+{% extends 'index.html' %}
+
+{% block content%}
+
+<div class="main-panel">
+    <div class="content-wrapper pb-0">
+        <div class="container py-5">
+            <h2 class="mb-4">Hikvision Connection Test — Users</h2>
+
+            {% if users %}
+            <div class="table-responsive mb-3">
+                <table class="table table-bordered table-hover align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th>#</th>
+                            <th>Employee No</th>
+                            <th>Name</th>
+                            <th>User Type</th>
+                            <th>Group ID</th>
+                            <th>Cards</th>
+                            <th>FPs</th>
+                            <th>Faces</th>
+                            <th>Door Right</th>
+                            <th>RightPlan</th>
+                            <th>Valid From</th>
+                            <th>Valid To</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for user in users %}
+
+                        {% now "Y-m-d" as today %}
+                        <tr style="{% if user.Valid.endTime and user.Valid.endTime|slice:':10' < today %}color:red{% else %}color:black{% endif %}">
+                            <td>{{ forloop.counter }}</td>
+                            <td>{{ user.employeeNo }}</td>
+                            <td>{{ user.name }}</td>
+                            <td>{{ user.userType }}</td>
+                            <td>{{ user.groupId }}</td>
+                            <td>{{ user.numOfCard }}</td>
+                            <td>{{ user.numOfFP }}</td>
+                            <td>{{ user.numOfFace }}</td>
+                            <td>{{ user.doorRight }}</td>
+                            <td>
+                                {% if user.RightPlan %}
+                                {% for rp in user.RightPlan %}
+                                <div class="small-muted">Door {{ rp.doorNo }} → Plan {{ rp.planTemplateNo }}</div>
+                                {% endfor %}
+                                {% else %}
+                                -
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if user.Valid and user.Valid.beginTime %}{{ user.Valid.beginTime }}{% else %}-{% endif %}
+                            </td>
+                            <td>
+                                {% if user.Valid and user.Valid.endTime %}{{ user.Valid.endTime }}{% else %}-{% endif %}
+                            </td>
+                            <td>
+                                {% if not user.Valid.endTime and user.Valid.endTime|slice:':10' < today %}
+                                {% else %}
+                                <a href="{%url 'get_person_data' user.employeeNo%}">Get Data</a>
+                                <a href="{% url 'delete_person_form_hik_device' user.employeeNo %}" class="btn btn-sm btn-danger">delete</a>
+
+                                <a class="btn btn-sm btn-success" data-bs-toggle="modal" data-bs-target="#exampleModalLabel{{ user.employeeNo }}">activate</a>
+                                
+                                <!-- Modal -->
+        <div class="modal fade" id="exampleModalLabel{{ user.employeeNo }}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+            aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">Add Member</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form action="{% url 'disable_enable_user' %}" method="post" id="addPersonForm">
+                            {% csrf_token %}
+                            <div class="mb-3">
+                                <label for="employee_no" class="form-label">Employee No</label>
+                                <input type="text" value="{{ user.employeeNo }}" readonly class="form-control" id="employee_no" name="employee_no" required>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="name" class="form-label">Name</label>
+                                <input type="text" class="form-control" value="{{ user.name}}" readonly id="name" name="name">
+                            </div>
+
+                            <!-- <div class="mb-3">
+                                <label for="gender" class="form-label">Gender</label>
+                                <select class="form-control" id="gender" name="gender" required>
+                                    <option value="" selected disabled>Select Gender</option>
+                                    <option value="male">Male</option>
+                                    <option value="female">Female</option>
+                                </select>
+                            </div> -->
+
+                            <div class="mb-3">
+                                <label for="began_time" class="form-label">Begin Time</label>
+                                <input type="datetime-local" class="form-control" id="began_time" name="began_time"
+                                    required>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="end_time" class="form-label">End Time</label>
+                                <input type="datetime-local" class="form-control" id="end_time" name="end_time"
+                                    required>
+                            </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary">Save changes</button>
+                    </div>
+                        </form>
+
+                </div>
+            </div>
+        </div>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="alert alert-warning">No users to display.</div>
+            {% endif %}
+
+            <details class="mt-4">
+                <summary class="fw-semibold">Show raw JSON</summary>
+                <pre class="json mt-2">{{ raw_json }}</pre>
+            </details>
+
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -103,6 +103,36 @@ DATABASES = {
 # database = "postgres://koyeb-adm:dwy7E4jQNqVX@ep-plain-wind-a2dg3t13.eu-central-1.pg.koyeb.app/Emmy_Db"
 # DATABASES["default"] = dj_database_url.parse(database)
 
+import logging
+
+# Suppress ONLY 404 warnings from media file requests
+class IgnoreMedia404(logging.Filter):
+    def filter(self, record):
+        # record.args[0] is usually the request path
+        return "/media/" not in str(record.args)
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'filters': {
+        'ignore_media_404': {
+            '()': IgnoreMedia404,
+        },
+    },
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+            'filters': ['ignore_media_404'],
+        },
+    },
+    'loggers': {
+        'django.request': {
+            'handlers': ['console'],
+            'level': 'WARNING',   # keep other warnings
+            'propagate': False,
+        },
+    },
+}
 
 
 

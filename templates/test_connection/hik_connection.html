@@ -1,0 +1,132 @@
+{% extends 'index.html' %}
+
+{% block content%}
+
+<div class="main-panel">
+    <div class="content-wrapper pb-0">
+        <div class="container py-5">
+            <h2 class="mb-4">Hikvision Connection Test</h2>
+
+            <!-- Status alert -->
+            {% if success %}
+            <div class="alert alert-success">
+                <strong>Connection OK.</strong>
+                {% if status_code %}<span class="ms-2">HTTP {{ status_code }}</span>{% endif %}
+            </div>
+
+            <div class="row mt-5 mb-5">
+                <div class="col"> <a class="btn btn-info" href="{% url 'get_all_persons' %}">View all Member</a> </div>
+                <div class="col"> <a class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">Add
+                        Member</a>
+                </div>
+                <div class="col"><a href="{%url 'BulkUserUpdate' %}" class="btn btn-info" onclick="return confirm('Are You Sure ??')">Bulk Update</a></div>
+                <div class="col"></div>
+            </div>
+            {% else %}
+            <div class="alert alert-danger">
+                <strong>Connection failed.</strong>
+                {% if error %} <div class="mt-1">{{ error }}</div>{% endif %}
+                {% if status_code %} <div class="small text-muted">HTTP status: {{ status_code }}</div>{% endif %}
+            </div>
+            {% endif %}
+
+            <!-- If DeviceInfo present show table -->
+            {% if device_info %}
+            <h5>Device Info</h5>
+            <table class="table table-bordered table-striped">
+                <tbody>
+                    {% for key, value in device_info.items %}
+                    <tr>
+                        <th class="key-col">{{ key }}</th>
+                        <td>{{ value }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% endif %}
+
+            <!-- If userCheck present show its content (usually for failures) -->
+            {% if user_check %}
+            <h5 class="mt-3">User Check / Error Details</h5>
+            <table class="table table-bordered table-striped">
+                <tbody>
+                    {% for key, value in user_check.items %}
+                    <tr>
+                        <th class="key-col">{{ key }}</th>
+                        <td>{{ value }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+
+            {# Helpful quick summary #}
+            <div class="mb-3">
+                <strong>Status:</strong>
+                {% if user_check.statusString %} {{ user_check.statusString }} {% endif %}
+                {% if user_check.statusValue %} ({{ user_check.statusValue }}) {% endif %}
+            </div>
+            {% endif %}
+
+            <!-- Fallback: show raw text or raw JSON collapsible -->
+            <details class="mt-4">
+                <summary class="fw-semibold">Show raw response</summary>
+                <pre class="json mt-2">{{ raw_text|default:"(no response)" }}</pre>
+            </details>
+
+        </div>
+
+
+        <!-- Modal -->
+        <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+            aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">Add Member</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form action="{% url 'add_person' %}" method="post" id="addPersonForm">
+                            {% csrf_token %}
+                            <div class="mb-3">
+                                <label for="employee_no" class="form-label">Employee No</label>
+                                <input type="text" class="form-control" id="employee_no" name="employee_no" required>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="name" class="form-label">Name</label>
+                                <input type="text" class="form-control" id="name" name="name" required>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="gender" class="form-label">Gender</label>
+                                <select class="form-control" id="gender" name="gender" required>
+                                    <option value="" selected disabled>Select Gender</option>
+                                    <option value="male">Male</option>
+                                    <option value="female">Female</option>
+                                </select>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="began_time" class="form-label">Begin Time</label>
+                                <input type="datetime-local" class="form-control" id="began_time" name="began_time"
+                                    required>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="end_time" class="form-label">End Time</label>
+                                <input type="datetime-local" class="form-control" id="end_time" name="end_time"
+                                    required>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" form="addPersonForm" class="btn btn-primary">Save changes</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
