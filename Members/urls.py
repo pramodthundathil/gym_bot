@@ -71,6 +71,7 @@ urlpatterns = [
 ################################################################
 ################################################################
 ################## Hik Connection essentials ##################
+
     path("connection_test/", views.connection_test, name = "connection_test"),
     path("get_all_persons/", views.get_all_persons, name = "get_all_persons"),
     path("get_person_data/<str:employee_no>",views.get_person_data,name="get_person_data"),
@@ -78,9 +79,8 @@ urlpatterns = [
     path("delete_person_form_hik_device/<int:employee_no>/",views.delete_person_form_hik_device,name="delete_person_form_hik_device"),
     path("disable_enable_user",views.disable_enable_user,name="disable_enable_user"),
     path("BulkUserUpdate/",views.BulkUserUpdate,name="BulkUserUpdate"),
+
 ################################################################
-
-
     path("add_person_to_device/<int:employee_id>",views.add_person_to_device_hik,name="add_person_to_device"),
 ################################################################
 ################################################################

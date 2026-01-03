@@ -912,7 +912,6 @@ def ChangeSubscription(request,pk):
             sub_data.save()
 
 
-
             access = AccessToGate.objects.filter(Member = member)
 
             for i in access:
@@ -980,7 +979,6 @@ def Payments(request):
             else:
                 access.Status = False 
             access.save()
-            ScheduledTask()
             messages.success(request,"Payment Updated for member {}".format(user))
             return redirect("Payments")
         else:

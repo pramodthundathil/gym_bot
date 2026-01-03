@@ -2,6 +2,9 @@ import requests
 import requests
 from requests.auth import HTTPDigestAuth
 import json
+from Index.models import ConfigarationDB
+
+call_back_url = ConfigarationDB.objects.first().Call_Back_IP
 
 
 def hik_connection_test(device_ip, username, password, timeout=8):
@@ -12,10 +15,10 @@ def hik_connection_test(device_ip, username, password, timeout=8):
     """
     # Ensure the URL has scheme
     if not device_ip.startswith("http://") and not device_ip.startswith("https://"):
-        url = f"http://127.0.0.1:8000/call_connection/{device_ip}/{username}/{password}/"
+        url = f"http://{call_back_url}/call_connection/{device_ip}/{username}/{password}/"
     else:
         # user passed full URL already
-        url = f"127.0.0.1:8000/call_connection/{device_ip}/{username}/{password}/"
+        url = f"{call_back_url}/call_connection/{device_ip}/{username}/{password}/"
 
     try:
         print(f"[hik_connection_test] calling {url}")
