@@ -539,8 +539,8 @@ def add_person_to_device(member, subscription,access, device_serial_number="CQUH
 def Member(request):
     form = MemberAddForm()
     sub_form = SubscriptionAddForm()
-    Trainee = MemberData.objects.all()[:8][::-1]
-    subscribers = Subscription.objects.all()[:8][::-1]
+    Trainee = MemberData.objects.all().order_by('-id')[:8]
+    subscribers = Subscription.objects.all().order_by('-id')[:8]
     notification_payments = Payment.objects.filter(Payment_Date__gte=start_date, Payment_Date__lte=today)
 
     if request.method == "POST":
@@ -632,8 +632,8 @@ def MemberAdvanced(request):
     """
     form = MemberAddForm()
     sub_form = SubscriptionAddForm()
-    Trainee = MemberData.objects.all()[:8][::-1]
-    subscribers = Subscription.objects.all()[:8][::-1]
+    Trainee = MemberData.objects.all().order_by('-id')[:8]
+    subscribers = Subscription.objects.all().order_by('-id')[:8]
     notification_payments = Payment.objects.filter(Payment_Date__gte=start_date, Payment_Date__lte=today)
 
     if request.method == "POST":
@@ -936,10 +936,10 @@ def ChangeSubscription(request,pk):
 @login_required(login_url='SignIn')
 def Payments(request):
     form = PaymentForm()
-    pay = Payment.objects.all()[:8][::-1]
-    sub_today = Subscription.objects.filter(Subscription_End_Date = today,Payment_Status = False)[:8][::-1]
-    sub_past = Subscription.objects.filter(Subscription_End_Date__lte = today,Payment_Status = False)[:8][::-1]
-    sub_Upcoming = Subscription.objects.filter(Subscription_End_Date__gte = today,Subscription_End_Date__lte = end_date, Payment_Status = False)[:8][::-1]
+    pay = Payment.objects.all().order_by('-Payment_Date', '-id')[:8]
+    sub_today = Subscription.objects.filter(Subscription_End_Date = today,Payment_Status = False).order_by('-Subscription_End_Date', '-id')[:8]
+    sub_past = Subscription.objects.filter(Subscription_End_Date__lte = today,Payment_Status = False).order_by('-Subscription_End_Date', '-id')[:8]
+    sub_Upcoming = Subscription.objects.filter(Subscription_End_Date__gte = today,Subscription_End_Date__lte = end_date, Payment_Status = False).order_by('-Subscription_End_Date', '-id')[:8]
     member = MemberData.objects.all()
     
     if request.method == "POST":
@@ -1558,19 +1558,19 @@ def BlockAccess(request,pk):
 
 @login_required(login_url='SignIn')
 def AllMembers(request):
-    members = MemberData.objects.all()[::-1]
+    members = MemberData.objects.all().order_by('-id')
     return render(request, "allmembers.html",{"member":members})
 
 @login_required(login_url='SignIn')
 def AllPayments(request):
-    payments = Payment.objects.all()[::-1]
+    payments = Payment.objects.all().order_by('-Payment_Date', '-id')
     return render(request,"allpayments.html",{"payments":payments})
 
 
 
 @login_required(login_url='SignIn')
 def FeePendingMembers(request):
-    subscribers = Subscription.objects.all()
+    subscribers = Subscription.objects.all().order_by('-id')
 
     return render(request,"feependingmembers.html",{"subscribers":subscribers})
 # Reports generation
