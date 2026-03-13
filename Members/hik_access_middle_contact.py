@@ -4,7 +4,9 @@ from requests.auth import HTTPDigestAuth
 import json
 from Index.models import ConfigarationDB
 
-call_back_url = ConfigarationDB.objects.first().Call_Back_IP
+def get_call_back_url():
+    config = ConfigarationDB.objects.first()
+    return config.Call_Back_IP if config else "127.0.0.1:8000"
 
 
 def hik_connection_test(device_ip, username, password, timeout=8):
@@ -13,6 +15,7 @@ def hik_connection_test(device_ip, username, password, timeout=8):
     or None on failure.
     device_ip may include a port, e.g. "127.0.0.1:8000"
     """
+    call_back_url = get_call_back_url()
     # Ensure the URL has scheme
     if not device_ip.startswith("http://") and not device_ip.startswith("https://"):
         url = f"http://{call_back_url}/call_connection/{device_ip}/{username}/{password}/"

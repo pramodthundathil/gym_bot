@@ -2,7 +2,6 @@
 db.sqlite3
 
 # Ignore media files (uploaded images, documents, etc.)
-media/
 
 # Ignore Python cache files
 __pycache__/
