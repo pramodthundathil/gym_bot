@@ -101,27 +101,27 @@ WSGI_APPLICATION = 'gym_bot.wsgi.application'
 #     }
 # }
 
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'emmygym',
+        'USER': 'postgres',
+        'PORT': 5432,
+        'PASSWORD': 1234,
+        'HOST': 'Localhost'
+    }
+}
+
 # DATABASES = {
 #     'default': {
 #         'ENGINE': 'django.db.backends.postgresql',
 #         'NAME': 'emmygym',
 #         'USER': 'emmyuser',
-#         'PORT': 5432,
-#         'PASSWORD': 1234,
-#         'HOST': 'Localhost'
+#         'PASSWORD': '1234@qwer',
+#         'HOST': 'localhost',
+#         'PORT': '5432',
 #     }
 # }
-
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'emmygym',
-        'USER': 'emmyuser',
-        'PASSWORD': '1234@qwer',
-        'HOST': 'localhost',
-        'PORT': '5432',
-    }
-}
 # database = "postgres://koyeb-adm:dwy7E4jQNqVX@ep-plain-wind-a2dg3t13.eu-central-1.pg.koyeb.app/Emmy_Db"
 # DATABASES["default"] = dj_database_url.parse(database)
 

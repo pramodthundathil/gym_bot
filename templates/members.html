@@ -105,7 +105,11 @@
                       {% endif %}
                     </td>
                     <td>
+                        {% if sub.Member.id %}
                         <a href="{%url 'MembersSingleView' sub.Member.id %}" class="btn btn-outline-info">View</a>
+                        {% else %}
+                        <span class="text-danger">No Member</span>
+                        {% endif %}
                     </td>
                   </tr>
                   {% endfor %}
