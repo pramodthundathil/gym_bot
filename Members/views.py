@@ -1445,7 +1445,10 @@ def ExtendAccessToGate(request, pk):
     password = settings_conf.Admin_Password
 
     member = get_object_or_404(MemberData, id=pk)
-    subscrib = get_object_or_404(Subscription, Member=member)
+    try:
+        subscrib = Subscription.objects.filter(Member=member).first()
+    except Subscription.DoesNotExist:
+        subscrib = None
 
     if request.method == "POST":
 
