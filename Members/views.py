@@ -788,9 +788,12 @@ def sync_member_to_device(member_id):
 @login_required(login_url='SignIn')
 def MembersSingleView(request,pk):
     member = MemberData.objects.get(id = pk)
-    subscription = Subscription.objects.get(Member = member)
     try:
-        access = AccessToGate.objects.get(Member = member)
+        subscription = Subscription.objects.filter(Member = member).first()
+    except:
+        subscription = None
+    try:
+        access = AccessToGate.objects.filter(Member = member).first()
     except:
         access = AccessToGate.objects.create(Member = member,Subscription = subscription,Validity_Date = datetime.now()) 
         access.save()
